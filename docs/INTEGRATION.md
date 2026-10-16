@@ -1,0 +1,85 @@
+# Integrating the globe
+
+## React website
+
+Copy `src/components/Globe.jsx` and `src/components/Globe.css` together into your application's component directory. Copy `public/data/countries.geojson` into your application's public/static assets. Preserve the geographic provenance and license information from this repository's README.
+
+Install the runtime dependencies with your project's package manager:
+
+```sh
+npm install react react-dom three d3-geo
+```
+
+This repository verifies React 19, Three.js 0.180, and d3-geo 3; exact resolved versions are recorded in `package-lock.json`. The component uses standard React hooks and a browser WebGL renderer. Vite and Playwright are development tools and are not component runtime dependencies. No React Three Fiber dependency is required.
+
+```jsx
+import Globe from './components/Globe.jsx';
+
+export default function CompanySection() {
+  return (
+    <div style={{ width: '100%', maxWidth: 560, aspectRatio: '1' }}>
+      <Globe
+        dataUrl="/data/countries.geojson"
+        rotationPeriod={20}
+        landColor="#86c9a0"
+        oceanColor="#142e23"
+        borderColor="#3d7657"
+      />
+    </div>
+  );
+}
+```
+
+The parent supplies the dimensions and background. The component's canvas is transparent outside the sphere, while the sphere itself is solid. It can sit over a company section's existing color, image, or gradient. The component imports its own narrowly scoped stylesheet; do not copy `src/style.css` or `src/main.jsx`. Those are preview-only files. The production `dist/` folder is a demo build, not an npm component package.
+
+For a site hosted below a URL prefix, supply the correct asset path, e.g. `dataUrl="/company/assets/countries.geojson"`. Vite consumers can use ``dataUrl={`${import.meta.env.BASE_URL}data/countries.geojson`}``. A cross-origin data URL must permit CORS. A missing asset or unavailable WebGL produces an accessible fallback message. The component performs no browser operations until it mounts; frameworks such as Next.js should import it through a client component (`'use client'`).
+
+## Existing non-React website
+
+A bundled React island can mount the same component in an existing DOM element. Your asset build must support JSX, CSS imports, and npm dependencies:
+
+```jsx
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import Globe from './components/Globe.jsx';
+
+const root = createRoot(document.getElementById('company-globe'));
+root.render(<Globe dataUrl="/assets/countries.geojson" />);
+// When that section is removed:
+// root.unmount();
+```
+
+```html
+<div id="company-globe" style="width:100%;max-width:560px;aspect-ratio:1"></div>
+```
+
+No global Three.js scripts, external APIs, or credentials are needed. Mount once per globe, and unmount when your application's navigation removes the section.
+
+## Props
+
+| Prop | Default | Purpose |
+| --- | --- | --- |
+| `dataUrl` | `/data/countries.geojson` | GeoJSON asset URL. Use the supplied, filtered file. |
+| `rotationPeriod` | `20` | Seconds per revolution. Positive finite values animate; zero or negative values stop automatic rotation. |
+| `paused` | `false` | Stop automatic rotation without blocking manual interaction. Can be controlled by the host page. |
+| `interactive` | `true` | Enable mouse/touch dragging and focused arrow keys. Disabling it allows normal touch scrolling over the canvas. |
+| `landColor` | `#86c9a0` | Polygon fill. |
+| `oceanColor` | `#142e23` | Solid sphere color underneath polygons, including excluded areas. |
+| `borderColor` | `#3d7657` | Included country outlines. |
+| `maxPixelRatio` | `1.5` | Upper device-pixel-ratio limit. Use `1` to reduce fill cost on constrained devices. |
+| `textureWidth` | `2048` | Atlas width, clamped to 512–4096. The height is half the width. Higher values improve close-up boundaries at extra memory/startup cost. |
+| `className`, `style` | none | Apply host layout styles to the wrapper. |
+| `onReady` | none | Called after scene initialization. |
+| `onFrame` | none | Optional diagnostics callback with `timestamp` (rAF milliseconds), `delta`/`elapsed` (seconds), unwrapped `rotation` (radians), `drawCalls`, and `triangles`. Avoid setting React state every frame. |
+
+Changing pause, speed, or callbacks does not recreate the renderer. Changing geography, colors, quality, or interactivity recreates the scene and starts its orientation again. Treat those as initialization options when continuity matters.
+
+## Motion and performance
+
+The animation uses `requestAnimationFrame` timestamps and `2π / rotationPeriod × deltaSeconds` to advance the sphere, independently of OrbitControls. The angle is never reset at the end of a revolution, and elapsed time is not clipped on slow frames. Automatic rotation continues during dragging, while controls change the viewing angle. Controls have no inertia, so paused and reduced-motion views settle immediately.
+
+The browser schedules rendering at its available refresh rate; the component imposes no 30/60 FPS cap. Hardware-supported 60 FPS is the target, not a guarantee on software WebGL or busy mobile devices. A hidden tab or offscreen globe stops rendering and resets its time baseline on return, avoiding a catch-up jump. `prefers-reduced-motion: reduce` overrides automatic rotation, with live preference changes supported. Static views render on demand during resize and interaction.
+
+The scene uses one unlit textured sphere, one draw call, 6,016 triangles, a one-time 2048×1024 canvas atlas, capped pixel density, and no lights, shadows, post-processing, or per-frame React updates. The vector-style country outlines are baked into the texture once. ResizeObserver keeps the sphere fitted to the parent. Geometry, materials, textures, controls, observers, listeners, requests, and the renderer are released on unmount.
+
+The demo's `window.__globeFrame` / `window.__globeSamples` instrumentation belongs only to `src/main.jsx`; the component itself creates no globals. See `previews/performance.json` for measurements from this cloud browser, which uses SwiftShader software rendering rather than a hardware GPU.

@@ -1,27 +1,30 @@
-# expla — A world of possibilities
+# expla globe
 
-Responsive React + Vite landing page with a Three.js globe, real country polygons, subtle lighting, pointer/touch rotation, pause control, keyboard arrows, and automatic reduced-motion support. No country labels are rendered.
+A standalone React + Three.js globe with a transparent background, flat illustrated country polygons, a continuous 20-second rotation, drag/touch/keyboard interaction, and reduced-motion support. The page in `src/main.jsx` is only a minimal preview. No landing page, labels, buttons, or decorative UI are included.
 
-## Develop
+- **Integrate:** [Developer handoff](docs/INTEGRATION.md)
+- **Component:** [Globe.jsx](src/components/Globe.jsx) and [Globe.css](src/components/Globe.css)
+- **Video:** [10-second MP4, 30 FPS](previews/expla-globe-30fps.mp4)
+- **Measurements and recording details:** [Preview notes](previews/README.md)
 
-Requires Node.js 20.19+ or 22.12+ (verified on Node.js 24).
+## Develop and verify
+
+Node.js 20.19+ or 22.12+ (verified on Node.js 24):
 
 ```sh
 npm ci --cache /tmp/expla-npm-cache
 npm run dev -- --port 5173
+# In a second terminal:
 npm run build
+npm run test:smoke
 ```
 
-The development server binds to all interfaces. `npm run preview` serves the production build. No credentials or runtime external services are required; geography is served locally. Contact links are sample `hello@expla.com` mail links and should be confirmed before launch.
+The browser test uses `/usr/bin/chromium` if available. Otherwise run `npx playwright install chromium` or set `CHROMIUM_PATH`. `BASE_URL` overrides the default development-server URL. Tests verify actual browser animation timing, forced slow frames, multiple angle wrap boundaries, pause, mouse and keyboard interaction, reduced motion changes, transparent pixels, mobile layout, excluded countries, cleanup, and fetch errors. Performance samples are collected without screenshot capture; results are written to `/tmp/expla-globe-performance.json`. FPS depends on hardware and is reported rather than asserted.
 
-## Browser validation
+`npm run record:preview` regenerates the MP4 using Chromium and a system `ffmpeg` executable. See [recording methodology](previews/README.md). `npm run preview` serves the production build; the test fixture itself is development-only. Vite reports a non-fatal large-chunk advisory for the renderer bundle.
 
-With the development server running on port 5173, run `npm run test:smoke`. The test uses system Chromium at `/usr/bin/chromium` when available; otherwise install Playwright Chromium with `npx playwright install chromium`, or set `CHROMIUM_PATH`. It checks actual WebGL rendering, animation, pause, mouse dragging, reduced motion, mobile horizontal overflow, country exclusions, and browser exceptions. Screenshots are saved to `/tmp/expla-desktop.png` and `/tmp/expla-mobile.png`.
+## Geographic data and license
 
-## Geographic data
+`public/data/countries.geojson` derives from [datasets/geo-countries](https://github.com/datasets/geo-countries), sourced from Natural Earth 1:10m Admin-0 geography and downloaded 2026-10-16. The dataset uses [ODC Public Domain Dedication and License 1.0](https://opendatacommons.org/licenses/pddl/1.0/); underlying Natural Earth data is public domain. Coordinates were rounded to three decimals, and adjacent vertices closer than 0.09 degrees were thinned for delivery.
 
-`public/data/countries.geojson` is derived from [datasets/geo-countries](https://github.com/datasets/geo-countries), sourced from Natural Earth 1:10m Admin-0 geography, downloaded 2026-10-16. The source is released under [ODC Public Domain Dedication and License 1.0](https://opendatacommons.org/licenses/pddl/1.0/); Natural Earth data is public domain. Coordinates were rounded to three decimals and neighboring vertices closer than 0.09 degrees were thinned for browser delivery.
-
-Features with ISO alpha-3 codes `RUS` and `BLR` were removed from the shipped dataset and are filtered again at render time. They receive no fill or outlines. A single uninterrupted sphere remains underneath all geography. Adjacent included countries retain their own complete borders. Ring winding is normalized for d3-geo before rasterizing the country texture. The texture is applied to a true 3D sphere, with no animation reset between revolutions.
-
-Reduced-motion preference disables automatic rotation; manual rotation remains available. The renderer caps device pixel ratio at 2 and releases WebGL resources when unmounted. Vite may report a non-fatal large-chunk advisory due to the Three.js renderer.
+Features with ISO alpha-3 codes `RUS` and `BLR` are absent from the shipped dataset and filtered again when rendering. They have no country fill or outlines. The sphere beneath remains uninterrupted. Included neighbors retain their own complete boundaries. No country labels are drawn. Ring winding is normalized for d3-geo before texture generation. All geography is served locally, without API keys or third-party runtime services.

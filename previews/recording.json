@@ -1,0 +1,11 @@
+{
+  "file": "expla-globe-30fps.mp4",
+  "durationSeconds": 10,
+  "fps": 30,
+  "frames": 300,
+  "uniqueBrowserFrames": 300,
+  "width": 640,
+  "height": 640,
+  "rotationPeriodSeconds": 20,
+  "method": "Actual Chromium WebGL frames rendered offline with exact 30 Hz requestAnimationFrame timestamps. No interpolation or duplicated frames. This is not a real-time FPS benchmark."
+}
