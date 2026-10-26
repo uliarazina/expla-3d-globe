@@ -1,5 +1,5 @@
 /* Preview page only. Integrators do not need this stylesheet. */
-:root { color: #e8f1eb; background: #080c0a; }
+:root { color: #e8f1eb; background: #0e0e12; }
 body { margin: 0; }
 #root { min-height: 100svh; display: grid; place-items: center; }
 .preview { width: min(640px, 92vw, 92svh); aspect-ratio: 1; }

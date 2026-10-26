@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { geoEquirectangular, geoPath, geoArea } from 'd3-geo';
 import './Globe.css';
+import { createGlobeMaterial } from './globeMaterial.js';
 
 /** Standalone, transparent globe. The parent controls its size. */
 export default function Globe({
@@ -10,9 +11,11 @@ export default function Globe({
   rotationPeriod = 20,
   paused = false,
   interactive = true,
-  landColor = '#86c9a0',
-  oceanColor = '#142e23',
-  borderColor = '#3d7657',
+  landColor = '#00f58a',
+  oceanColor = '#111215',
+  borderColor = '#00e580',
+  relief = 0.012,
+  rimStrength = 0.20,
   maxPixelRatio = 1.5,
   textureWidth = 2048,
   className = '',
@@ -96,6 +99,39 @@ export default function Globe({
         for (const feature of data.features) {
           context.beginPath(); path(feature); context.fill(); context.stroke();
         }
+        // The separate mask joins neighboring fills: internal borders never become cracks.
+        const mask = document.createElement('canvas');
+        mask.width = width; mask.height = width / 2;
+        const maskContext = mask.getContext('2d');
+        maskContext.fillStyle = '#000'; maskContext.fillRect(0, 0, width, width / 2);
+        maskContext.fillStyle = '#fff';
+        const maskPath = geoPath(projection, maskContext);
+        for (const feature of data.features) {
+          maskContext.beginPath(); maskPath(feature); maskContext.fill();
+          // Fill antialias gaps between adjacent included countries without touching excluded features.
+          maskContext.strokeStyle = '#fff'; maskContext.lineWidth = 0.4; maskContext.stroke();
+        }
+        const pixels = maskContext.getImageData(0, 0, width, width / 2);
+        const raw = pixels.data.slice();
+        const height = mask.height;
+        const coverage = (x, y) => raw[(Math.max(0, Math.min(height - 1, y)) * width + (x + width) % width) * 4];
+        // Prebake the coast bevel and shadow instead of doing six texture lookups per fragment.
+        for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {
+          const offset = (y * width + x) * 4;
+          pixels.data[offset + 1] = Math.round(127.5 + (coverage(x + 1, y) - coverage(x - 1, y)) / 2);
+          pixels.data[offset + 2] = Math.round(127.5 + (coverage(x, y - 1) - coverage(x, y + 1)) / 2);
+          pixels.data[offset + 3] = coverage(x - 2, y - 2);
+        }
+        // Typed data preserves all four independent channels, including RGB where A=0.
+        const packed = new Uint8Array(pixels.data.length);
+        for (let y = 0; y < height; y++) {
+          packed.set(pixels.data.subarray(y * width * 4, (y + 1) * width * 4), (height - 1 - y) * width * 4);
+        }
+        const reliefMap = new THREE.DataTexture(packed, width, height, THREE.RGBAFormat);
+        reliefMap.minFilter = THREE.LinearFilter;
+        reliefMap.magFilter = THREE.LinearFilter;
+        reliefMap.needsUpdate = true;
+        resources.push(reliefMap);
         const texture = new THREE.CanvasTexture(atlas);
         texture.colorSpace = THREE.SRGBColorSpace;
         resources.push(texture);
@@ -107,12 +143,23 @@ export default function Globe({
         scene = new THREE.Scene();
         camera = new THREE.PerspectiveCamera(34, 1, 0.1, 20);
         camera.position.set(0, 0, 3.7);
-        // One draw call; unlit material preserves the flat illustrated colors.
+        // One draw call, no shadow maps or post-processing. Relief is continuous,
+        // so excluded geography exposes the intact sphere rather than cutting holes.
         const geometry = new THREE.SphereGeometry(1, 64, 48);
-        const material = new THREE.MeshBasicMaterial({ map: texture });
+        const positions = geometry.attributes.position;
+        const uv = geometry.attributes.uv;
+        for (let index = 0; index < positions.count; index++) {
+          const land = coverage(Math.round(uv.getX(index) * (width - 1)), Math.round((1 - uv.getY(index)) * (height - 1))) / 255;
+          const scale = 1 + land * Math.max(0, Math.min(0.03, relief));
+          positions.setXYZ(index, positions.getX(index) * scale, positions.getY(index) * scale, positions.getZ(index) * scale);
+        }
+        geometry.computeBoundingSphere();
+        const material = createGlobeMaterial({ colorMap: texture, reliefMap,
+          textureWidth: width, relief: Math.max(0, Math.min(0.03, relief)),
+          rimStrength: Math.max(0, Math.min(1, rimStrength)) });
         resources.push(geometry, material);
         globe = new THREE.Mesh(geometry, material);
-        globe.rotation.set(0.12, -1.25, 0);
+        globe.rotation.set(0.5, -1.45, 0);
         scene.add(globe);
         controls = new OrbitControls(camera, renderer.domElement);
         controls.enabled = interactive;
@@ -160,7 +207,7 @@ export default function Globe({
       controls?.dispose(); resources.forEach(resource => resource.dispose());
       renderer?.dispose(); renderer?.domElement.remove();
     };
-  }, [dataUrl, interactive, landColor, oceanColor, borderColor, maxPixelRatio, textureWidth]);
+  }, [dataUrl, interactive, landColor, oceanColor, borderColor, relief, rimStrength, maxPixelRatio, textureWidth]);
 
   return <div className={`expla-globe ${className}`} style={style} ref={mount} data-interactive={interactive}>
     {error && <p className="expla-globe__error" role="alert">{error}</p>}

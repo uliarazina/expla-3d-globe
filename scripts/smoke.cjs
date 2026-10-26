@@ -8,6 +8,9 @@ const { launch, baseURL } = require('./browser.cjs');
     const page = await browser.newPage({ viewport: { width: 800, height: 800 }, reducedMotion: 'no-preference' });
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
+    page.on('console', message => {
+      if (message.type() === 'error' && /THREE.WebGLProgram|VALIDATE_STATUS|shader error/i.test(message.text())) errors.push(message.text());
+    });
     await page.goto(baseURL);
     await page.waitForSelector('canvas');
     await page.waitForTimeout(1200);
