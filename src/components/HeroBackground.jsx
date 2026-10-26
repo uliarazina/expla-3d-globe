@@ -52,14 +52,14 @@ export default function HeroBackground() {
           varying vec2 uvPosition;
           void main(){
             vec2 uv=uvPosition;
-            float t=time*.18;
-            // Zero distortion at t=0 preserves the uploaded image exactly.
+            float t=time*.34;
+            // Continuous autonomous flow starts with the uploaded image at t=0.
             vec2 drift=vec2(sin(t+uv.y*3.0)-sin(uv.y*3.0),
-              sin(t*.73+uv.x*4.0)-sin(uv.x*4.0))*.008;
+              sin(t*.73+uv.x*4.0)-sin(uv.x*4.0))*.035;
             vec2 offset=(uv-pointer)*vec2(aspect,1.0);
             float influence=exp(-dot(offset,offset)*1.4);
             vec2 swirl=vec2(-offset.y,offset.x)/vec2(aspect,1.0);
-            vec2 reactive=(swirl*.07+(pointer-.5)*.035)*activity*influence;
+            vec2 reactive=(swirl*.14+(pointer-.5)*.08)*activity*influence;
             // Anchor the image edges so movement never reveals empty borders.
             vec2 envelope=sin(uv*3.14159265);
             uv+=(drift+reactive)*envelope;
