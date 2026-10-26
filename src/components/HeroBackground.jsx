@@ -23,14 +23,14 @@ export default function HeroBackground() {
         material.uniforms.pointer.value.set(.5, .5); material.uniforms.activity.value = 0;
       } else {
         activity *= Math.exp(-delta * .8);
-        material.uniforms.pointer.value.lerp(target, 1 - Math.exp(-delta * 2.8));
-        material.uniforms.activity.value = THREE.MathUtils.lerp(material.uniforms.activity.value, activity, 1 - Math.exp(-delta * 1.8));
+        material.uniforms.pointer.value.lerp(target, 1 - Math.exp(-delta * 7));
+        material.uniforms.activity.value = THREE.MathUtils.lerp(material.uniforms.activity.value, activity, 1 - Math.exp(-delta * 6));
       }
       renderer.render(scene, camera);
       if (!motion.matches) schedule();
     }
     let scene, camera;
-    const move = event => { const r = section.getBoundingClientRect(); const x = THREE.MathUtils.clamp((event.clientX - r.left) / r.width, 0, 1), y = THREE.MathUtils.clamp(1 - (event.clientY - r.top) / r.height, 0, 1); activity = Math.min(1, activity + .10 + Math.hypot(x - target.x, y - target.y) * 6); target.set(x, y); schedule(); };
+    const move = event => { const r = section.getBoundingClientRect(); const x = THREE.MathUtils.clamp((event.clientX - r.left) / r.width, 0, 1), y = THREE.MathUtils.clamp(1 - (event.clientY - r.top) / r.height, 0, 1); activity = Math.min(1, activity + .22 + Math.hypot(x - target.x, y - target.y) * 12); target.set(x, y); schedule(); };
     const leave = () => { activity = 0; target.set(.5, .5); schedule(); };
     try {
       renderer = new THREE.WebGLRenderer({ alpha: false, antialias: false, powerPreference: 'low-power' });
@@ -52,14 +52,14 @@ export default function HeroBackground() {
           varying vec2 uvPosition;
           void main(){
             vec2 uv=uvPosition;
-            float t=time*.85;
+            float t=time*1.2;
             // Continuous autonomous flow starts with the uploaded image at t=0.
             vec2 drift=vec2(sin(t+uv.y*3.0)-sin(uv.y*3.0),
               sin(t*.73+uv.x*4.0)-sin(uv.x*4.0))*.13;
             vec2 offset=(uv-pointer)*vec2(aspect,1.0);
             float influence=exp(-dot(offset,offset)*1.4);
             vec2 swirl=vec2(-offset.y,offset.x)/vec2(aspect,1.0);
-            vec2 reactive=(swirl*.14+(pointer-.5)*.08)*activity*influence;
+            vec2 reactive=(swirl*.24+(pointer-.5)*.14)*activity*influence;
             // Anchor the image edges so movement never reveals empty borders.
             vec2 envelope=sin(uv*3.14159265);
             uv+=(drift+reactive)*envelope;
