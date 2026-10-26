@@ -85,3 +85,5 @@ The globe now renders at up to Retina 2× with a 4K map. Coarse per-vertex eleva
 The latest TOP-100 shader uses a broad lower emerald arc, thin inner filaments, and a dark center following the new supplied reference. Idle drift and cursor deformation remain independent. Globe rotation now defaults to 40 seconds per turn; denser smooth geometry, more accurate projected paths, softer coast relief, and up to 8× anisotropic filtering improve clarity.
 
 The globe now uses a soft glossy studio highlight and restrained directional rim, with a stronger shaded coastline bevel, matching the earlier supplied glossy reference. The hero arcs have asymmetric flowing curvature and six fine animated filaments; idle motion and cursor interaction remain enabled.
+
+The current TOP-100 background replaces fine filament lines with broad diffused waves in the exact sRGB brand color `#27C77C` (converted to linear color for the shader). It animates on page load without pointer input; pointer movement adds stronger local distortion and brightness, then settles back to ambient drift. Reduced-motion preferences retain a static background.

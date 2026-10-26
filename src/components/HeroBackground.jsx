@@ -37,10 +37,10 @@ export default function HeroBackground() {
       renderer.domElement.setAttribute('aria-hidden', 'true'); host.appendChild(renderer.domElement);
       scene = new THREE.Scene(); camera = new THREE.Camera(); geometry = new THREE.PlaneGeometry(2, 2);
       material = new THREE.ShaderMaterial({
-        uniforms: { time: { value: 0 }, aspect: { value: 1 }, pointer: { value: new THREE.Vector2(.5, .5) }, activity: { value: 0 } },
+        uniforms: { brandColor: { value: new THREE.Color('#27C77C') }, time: { value: 0 }, aspect: { value: 1 }, pointer: { value: new THREE.Vector2(.5, .5) }, activity: { value: 0 } },
         vertexShader: 'varying vec2 uvPosition; void main(){uvPosition=uv;gl_Position=vec4(position,1.0);}',
         fragmentShader: `
-          uniform float time, aspect, activity; uniform vec2 pointer;
+          uniform float time, aspect, activity; uniform vec2 pointer; uniform vec3 brandColor;
           varying vec2 uvPosition;
           float band(float distance, float width){
             float d=distance/width; return exp(-d*d);
@@ -54,35 +54,28 @@ export default function HeroBackground() {
             float ambientAngle=sin(t*.55)*.055;
             mat2 ambientTurn=mat2(cos(ambientAngle),-sin(ambientAngle),sin(ambientAngle),cos(ambientAngle));
             p=ambientTurn*p;
-            float angle=activity*exp(-radius*radius*1.5)*sin(t*.8+radius*4.0)*1.05;
+            float angle=activity*exp(-radius*radius*1.5)*sin(t*.8+radius*4.0)*1.5;
             mat2 turn=mat2(cos(angle),-sin(angle),sin(angle),cos(angle));
             p=mouse+turn*(p-mouse);
             vec2 uv=p/vec2(aspect,1.0)+.5;
             uv+=vec2(.025*sin(t*.8+uv.y*4.0),.018*sin(t*.6+uv.x*3.0));
-            // Broad lower emerald sweep, fine inner filaments and a dark center.
-            vec2 center=vec2(.53+.012*sin(t*.5),.78+.012*cos(t*.4));
-            vec2 q=(uv-center)/vec2(.57,.90);
-            q.x+=.065*sin(q.y*2.6+t*.3);
-            q.y+=.04*sin(q.x*3.0-t*.35);
-            float r=length(q);
-            float flow=.85+.15*sin(atan(q.y,q.x)*3.0-t*.6);
-            float lower=1.0-smoothstep(.20,.95,uv.y);
-            float outer=band(r-1.0,.18)*flow;
-            float threads=0.0;
-            for(int i=0;i<6;i++){
-              float layer=float(i);
-              float strand=.73+layer*.043+.009*sin(t*.45+uv.x*5.0+layer);
-              threads+=.075*band(r-strand,.007+layer*.0015);
-            }
-            float leftArc=length((uv-vec2(.34,.12))/vec2(.38,.95));
-            float upperLeft=band(leftArc-1.0,.08)*smoothstep(.45,1.0,uv.y);
-            float corner=band(uv.x,.17)*(1.0-uv.y);
-            float readability=1.0-.72*exp(-pow((uvPosition.x-.5)/.24,2.0));
-            float hover=1.0+activity*.65*exp(-radius*2.0);
-            vec3 emerald=vec3(.0007,.095,.052)*outer*(.28+.72*lower)
-              +vec3(.0004,.038,.023)*threads
-              +vec3(.0003,.035,.021)*upperLeft+vec3(.0002,.035,.023)*corner;
-            gl_FragColor=vec4(vec3(.0003,.0009,.0006)+emerald*readability*hover,1.0);
+            // Wide, softly diffused waves: no fine contours or filament lines.
+            vec2 flowUv=uv+activity*(pointer-.5)*.18;
+            flowUv.x+=.055*sin(uv.y*4.0-t*.45);
+            flowUv.y+=.08*sin(uv.x*3.6+t*.55);
+            float rightCenter=.83+.10*sin(flowUv.y*4.0+t*.35);
+            float rightWave=band(flowUv.x-rightCenter,.19);
+            float lowerCenter=.13+.12*sin(flowUv.x*5.0-t*.45);
+            float lowerWave=band(flowUv.y-lowerCenter,.23);
+            float upperGlow=exp(-dot((flowUv-vec2(.77,.94))/vec2(.31,.49),
+              (flowUv-vec2(.77,.94))/vec2(.31,.49)));
+            float leftGlow=exp(-dot((flowUv-vec2(.08,.12))/vec2(.29,.40),
+              (flowUv-vec2(.08,.12))/vec2(.29,.40)));
+            float field=.48*rightWave+.33*lowerWave+.25*upperGlow+.16*leftGlow;
+            float readability=1.0-.78*exp(-pow((uvPosition.x-.48)/.25,2.0));
+            float hover=1.0+activity*1.1*exp(-radius*2.0);
+            float intensity=clamp(field*readability*hover,0.0,.92);
+            gl_FragColor=vec4(mix(vec3(.0004,.0008,.0006),brandColor,intensity),1.0);
             #include <colorspace_fragment>
           }
         `,
