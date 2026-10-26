@@ -3889,15 +3889,19 @@ void main() {
             vec2 p=(uvPosition-.5)*vec2(aspect,1.0);
             vec2 mouse=(pointer-.5)*vec2(aspect,1.0);
             float radius=length(p-mouse);
-            float t=time*.24;
-            float angle=sin(t*.45)*.025+activity*exp(-radius*radius*1.5)*sin(t*.8+radius*4.0)*.9;
+            float t=time*.42;
+            // Ambient movement has its own center; the cursor adds a local swirl.
+            float ambientAngle=sin(t*.55)*.055;
+            mat2 ambientTurn=mat2(cos(ambientAngle),-sin(ambientAngle),sin(ambientAngle),cos(ambientAngle));
+            p=ambientTurn*p;
+            float angle=activity*exp(-radius*radius*1.5)*sin(t*.8+radius*4.0)*1.05;
             mat2 turn=mat2(cos(angle),-sin(angle),sin(angle),cos(angle));
             p=mouse+turn*(p-mouse);
             vec2 uv=p/vec2(aspect,1.0)+.5;
-            uv+=vec2(.012*sin(t*.8+uv.y*4.0),.008*sin(t*.6+uv.x*3.0));
+            uv+=vec2(.025*sin(t*.8+uv.y*4.0),.018*sin(t*.6+uv.x*3.0));
             // Curved, feathered aurora arcs follow the supplied wide reference:
             // a bright lower-left sweep and a taller upper-right crescent.
-            vec2 rightCenter=vec2(.56+.008*sin(t*.5),.95);
+            vec2 rightCenter=vec2(.56+.018*sin(t*.5),.95);
             float rightRadius=length((uv-rightCenter)/vec2(.36,.98));
             float rightSide=smoothstep(-.10,.10,uv.x-rightCenter.x);
             float rightFlow=.72+.28*sin(uv.y*6.0-t*1.4);
