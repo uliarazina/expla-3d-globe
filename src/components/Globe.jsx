@@ -13,7 +13,7 @@ export default function Globe({
   landColor = '#03FA7F',
   oceanColor = '#212121',
   borderColor = '#02e573',
-  relief = 0.014,
+  relief = 0.022,
   rimStrength = 0,
   maxPixelRatio = 2,
   textureWidth = 4096,
@@ -119,14 +119,14 @@ export default function Globe({
         const height = mask.height;
         const coverage = (x, y) => raw[(Math.max(0, Math.min(height - 1, y)) * width + (x + width) % width) * 4];
         // Keep bevel width constant in geographic space as atlas quality increases.
-        const bevelStep = Math.max(1, Math.round(width / 2048));
+        const bevelStep = Math.max(1, Math.round(width / 1536));
         // Yield between rows so the higher-resolution atlas does not freeze the hero.
         for (let y = 0; y < height; y++) {
           for (let x = 0; x < width; x++) {
             const offset = (y * width + x) * 4;
             pixels.data[offset + 1] = Math.round(127.5 + (coverage(x + bevelStep, y) - coverage(x - bevelStep, y)) / 2);
             pixels.data[offset + 2] = Math.round(127.5 + (coverage(x, y - bevelStep) - coverage(x, y + bevelStep)) / 2);
-            pixels.data[offset + 3] = coverage(x - 2 * bevelStep, y - 2 * bevelStep);
+            pixels.data[offset + 3] = coverage(x - 3 * bevelStep, y - 3 * bevelStep);
           }
           if ((y + 1) % 64 === 0) {
             await new Promise(resolve => setTimeout(resolve, 0));
