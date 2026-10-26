@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import backgroundUrl from '../assets/top-100-background.png';
 
 export default function HeroBackground() {
   const mount = useRef(null);
@@ -7,17 +8,17 @@ export default function HeroBackground() {
     const host = mount.current, section = host.parentElement;
     const motion = matchMedia('(prefers-reduced-motion: reduce)');
     let renderer, geometry, material, frame = null, last = null, elapsed = 0, visible = true;
-    let activity = 0;
+    let activity = 0, texture, textureReady = false, disposed = false;
     const target = new THREE.Vector2(.5, .5);
     const schedule = () => { if (frame === null) frame = requestAnimationFrame(render); };
     const reset = () => { last = null; schedule(); };
     let resizeObserver, intersection;
     function render(time) {
       frame = null;
-      if (!visible || document.hidden || !renderer) { last = null; return; }
+      if (!visible || document.hidden || !renderer || !textureReady) { last = null; return; }
       const delta = last === null ? 0 : Math.min((time - last) / 1000, .1); last = time;
       if (!motion.matches) elapsed += delta;
-      material.uniforms.time.value = elapsed;
+      material.uniforms.time.value = motion.matches ? 0 : elapsed;
       if (motion.matches) {
         material.uniforms.pointer.value.set(.5, .5); material.uniforms.activity.value = 0;
       } else {
@@ -36,48 +37,33 @@ export default function HeroBackground() {
       renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1));
       renderer.domElement.setAttribute('aria-hidden', 'true'); host.appendChild(renderer.domElement);
       scene = new THREE.Scene(); camera = new THREE.Camera(); geometry = new THREE.PlaneGeometry(2, 2);
+      texture = new THREE.TextureLoader().load(backgroundUrl, () => {
+        if (disposed) return;
+        textureReady = true; reset();
+      });
+      texture.colorSpace = THREE.SRGBColorSpace;
       material = new THREE.ShaderMaterial({
-        uniforms: { brandColor: { value: new THREE.Color('#27C77C') }, time: { value: 0 }, aspect: { value: 1 }, pointer: { value: new THREE.Vector2(.5, .5) }, activity: { value: 0 } },
+        uniforms: { backgroundMap: { value: texture }, time: { value: 0 }, aspect: { value: 1 }, pointer: { value: new THREE.Vector2(.5, .5) }, activity: { value: 0 } },
         vertexShader: 'varying vec2 uvPosition; void main(){uvPosition=uv;gl_Position=vec4(position,1.0);}',
         fragmentShader: `
-          uniform float time, aspect, activity; uniform vec2 pointer; uniform vec3 brandColor;
+          uniform float time, aspect, activity;
+          uniform vec2 pointer;
+          uniform sampler2D backgroundMap;
           varying vec2 uvPosition;
-          float band(float distance, float width){
-            float d=distance/width; return exp(-d*d);
-          }
           void main(){
-            vec2 p=(uvPosition-.5)*vec2(aspect,1.0);
-            vec2 mouse=(pointer-.5)*vec2(aspect,1.0);
-            float radius=length(p-mouse);
-            float t=time*.42;
-            // Ambient movement has its own center; the cursor adds a local swirl.
-            float ambientAngle=sin(t*.55)*.055;
-            mat2 ambientTurn=mat2(cos(ambientAngle),-sin(ambientAngle),sin(ambientAngle),cos(ambientAngle));
-            p=ambientTurn*p;
-            float angle=activity*exp(-radius*radius*1.5)*sin(t*.8+radius*4.0)*1.5;
-            mat2 turn=mat2(cos(angle),-sin(angle),sin(angle),cos(angle));
-            p=mouse+turn*(p-mouse);
-            vec2 uv=p/vec2(aspect,1.0)+.5;
-            uv+=vec2(.025*sin(t*.8+uv.y*4.0),.018*sin(t*.6+uv.x*3.0));
-            // Wide, softly diffused waves: no fine contours or filament lines.
-            vec2 flowUv=uv+activity*(pointer-.5)*.18;
-            flowUv.x+=.055*sin(uv.y*4.0-t*.45);
-            flowUv.y+=.08*sin(uv.x*3.6+t*.55);
-            float rightCenter=.83+.10*sin(flowUv.y*4.0+t*.35);
-            float rightWave=band(flowUv.x-rightCenter,.19);
-            float lowerCenter=.13+.12*sin(flowUv.x*5.0-t*.45);
-            float lowerWave=band(flowUv.y-lowerCenter,.23);
-            float upperGlow=exp(-dot((flowUv-vec2(.77,.94))/vec2(.31,.49),
-              (flowUv-vec2(.77,.94))/vec2(.31,.49)));
-            float leftGlow=exp(-dot((flowUv-vec2(.08,.12))/vec2(.29,.40),
-              (flowUv-vec2(.08,.12))/vec2(.29,.40)));
-            float field=.48*rightWave+.33*lowerWave+.25*upperGlow+.16*leftGlow;
-            // Keep the text area nearly black throughout cursor distortion.
-            float edgeMask=smoothstep(.16,.48,abs(uvPosition.x-.5));
-            float readability=mix(.018,1.0,edgeMask);
-            float hover=1.0+activity*1.1*exp(-radius*2.0);
-            float intensity=clamp(field*readability*hover,0.0,.92);
-            gl_FragColor=vec4(mix(vec3(.0004,.0008,.0006),brandColor,intensity),1.0);
+            vec2 uv=uvPosition;
+            float t=time*.28;
+            // Zero distortion at t=0 preserves the uploaded image exactly.
+            vec2 drift=vec2(sin(t+uv.y*3.0)-sin(uv.y*3.0),
+              sin(t*.73+uv.x*4.0)-sin(uv.x*4.0))*.012;
+            vec2 offset=(uv-pointer)*vec2(aspect,1.0);
+            float influence=exp(-dot(offset,offset)*1.4);
+            vec2 swirl=vec2(-offset.y,offset.x)/vec2(aspect,1.0);
+            vec2 reactive=(swirl*.18+(pointer-.5)*.10)*activity*influence;
+            // Anchor the image edges so movement never reveals empty borders.
+            vec2 envelope=sin(uv*3.14159265);
+            uv+=(drift+reactive)*envelope;
+            gl_FragColor=vec4(texture2D(backgroundMap,uv).rgb,1.0);
             #include <colorspace_fragment>
           }
         `,
@@ -92,11 +78,12 @@ export default function HeroBackground() {
       resize();
     } catch { host.dataset.fallback = 'true'; renderer?.domElement.remove(); }
     return () => {
+      disposed = true; texture?.dispose();
       cancelAnimationFrame(frame); resizeObserver?.disconnect(); intersection?.disconnect();
       section.removeEventListener('pointermove', move); section.removeEventListener('pointerleave', leave); section.removeEventListener('pointercancel', leave);
       document.removeEventListener('visibilitychange', reset); motion.removeEventListener('change', reset);
       geometry?.dispose(); material?.dispose(); renderer?.dispose(); renderer?.domElement.remove();
     };
   }, []);
-  return <div className="hero-background" ref={mount} aria-hidden="true"/>;
+  return <div className="hero-background" ref={mount} style={{ backgroundImage: `url(${backgroundUrl})`, backgroundSize: '100% 100%' }} aria-hidden="true"/>;
 }

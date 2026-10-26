@@ -87,3 +87,5 @@ The latest TOP-100 shader uses a broad lower emerald arc, thin inner filaments, 
 The globe now uses a soft glossy studio highlight and restrained directional rim, with a stronger shaded coastline bevel, matching the earlier supplied glossy reference. The hero arcs have asymmetric flowing curvature and six fine animated filaments; idle motion and cursor interaction remain enabled.
 
 The current TOP-100 background replaces fine filament lines with broad diffused waves in the exact sRGB brand color `#27C77C` (converted to linear color for the shader). It animates on page load without pointer input; pointer movement adds stronger local distortion and brightness, then settles back to ambient drift. Reduced-motion preferences retain a static background.
+
+TOP-100 now uses the original `Vector.png` from the supplied ZIP, stored unchanged at `src/assets/top-100-background.png`. The shader samples this image without recoloring or procedural replacement. Distortion starts at zero and drifts slowly; pointer motion adds a local swirl. Edges stay anchored. Reduced motion displays the original undistorted image, and the same asset is the CSS loading/WebGL fallback.
