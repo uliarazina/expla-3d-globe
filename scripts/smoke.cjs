@@ -31,7 +31,7 @@ const { launch, baseURL } = require('./browser.cjs');
         drawCalls: frames.at(-1).drawCalls, triangles: frames.at(-1).triangles,
         renderer: debug ? gl.getParameter(debug.UNMASKED_RENDERER_WEBGL) : 'unknown' };
     });
-    assert(Math.abs(performance.rotationPeriod - 40) < 0.01, '40-second rotation period');
+    assert(Math.abs(performance.rotationPeriod - 60) < 0.01, '60-second rotation period');
     assert.equal(performance.drawCalls, 1);
     fs.writeFileSync('/tmp/expla-globe-performance.json', JSON.stringify(performance, null, 2));
     await page.screenshot({ path: '/tmp/expla-globe-desktop.png' });
@@ -49,7 +49,8 @@ const { launch, baseURL } = require('./browser.cjs');
     const heldAngle = await page.evaluate(() => window.__samples.at(-1).rotation);
     await page.waitForTimeout(350);
     assert.equal(await page.evaluate(() => window.__samples.at(-1).rotation), heldAngle, 'holding the mouse pauses auto rotation');
-    await page.mouse.up(); await page.waitForTimeout(350);
+    await page.mouse.up();
+    await page.waitForFunction(angle => window.__samples.at(-1).rotation > angle, heldAngle);
     const releasedAngle = await page.evaluate(() => window.__samples.at(-1).rotation);
     assert(releasedAngle > heldAngle && releasedAngle - heldAngle < .3, 'release resumes without a catch-up jump');
 

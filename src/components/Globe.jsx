@@ -7,7 +7,7 @@ import { createGlobeMaterial } from './globeMaterial.js';
 /** Standalone, transparent globe. The parent controls its size. */
 export default function Globe({
   dataUrl = '/data/countries.geojson',
-  rotationPeriod = 40,
+  rotationPeriod = 60,
   paused = false,
   interactive = true,
   landColor = '#03FA7F',

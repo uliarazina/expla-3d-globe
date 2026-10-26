@@ -20,7 +20,7 @@ export default function CompanySection() {
     <div style={{ width: '100%', maxWidth: 560, aspectRatio: '1' }}>
       <Globe
         dataUrl="/data/countries.geojson"
-        rotationPeriod={40}
+        rotationPeriod={60}
         landColor="#03FA7F"
         oceanColor="#212121"
         borderColor="#02e573"
@@ -60,7 +60,7 @@ No global Three.js scripts, external APIs, or credentials are needed. Mount once
 | Prop | Default | Purpose |
 | --- | --- | --- |
 | `dataUrl` | `/data/countries.geojson` | GeoJSON asset URL. Use the supplied, filtered file. |
-| `rotationPeriod` | `40` | Seconds per revolution. Positive finite values animate; zero or negative values stop automatic rotation. |
+| `rotationPeriod` | `60` | Seconds per revolution. Positive finite values animate; zero or negative values stop automatic rotation. |
 | `paused` | `false` | Stop automatic rotation without blocking manual interaction. Can be controlled by the host page. |
 | `interactive` | `true` | Enable horizontal mouse/touch turns and left/right arrow keys. Vertical gestures scroll the page without tilting the globe; the camera never orbits. |
 | `landColor` | `#03FA7F` | Polygon fill. |
@@ -92,7 +92,7 @@ The current appearance is reconstructed from the two PNG images supplied in chat
 
 Land `#03FA7F` and ocean `#212121` are the exact base-color values supplied by the user; border `#02e573` is a subtle derived outline. These values are not retrieved Figma design tokens. Lighting changes displayed pixel colors. Exact design tokens can replace these props later. Real GeoJSON replaces the reference's stylized geography, including the explicit RUS/BLR exclusions; those differences are intentional.
 
-Ukraine now includes Crimea and Sevastopol; see [geographic provenance](GEOGRAPHY.md). The stape.io reference could not be accessed (HTTP 403), so its rotation period has not been measured. The current default is 40 seconds per turn and can be changed via `rotationPeriod`.
+Ukraine now includes Crimea and Sevastopol; see [geographic provenance](GEOGRAPHY.md). The stape.io reference could not be accessed (HTTP 403), so its rotation period has not been measured. The current default is 60 seconds per turn and can be changed via `rotationPeriod`.
 
 Globe lighting follows the latest glossy reference: the default rim is 0.075, the ocean specular coefficient is 0.20, the land specular coefficient is 0.055, and the coast highlight coefficient is 0.045. The tighter studio reflection (shininess exponent 42) adds a lacquered finish without bloom or an external glow layer. Base land/ocean colors and geography are unchanged.
 
