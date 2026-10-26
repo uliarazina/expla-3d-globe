@@ -10,7 +10,9 @@
     "test:smoke": "node scripts/smoke.cjs",
     "record:preview": "node scripts/record-preview.cjs",
     "test:site": "node scripts/test-site.cjs",
-    "deploy:pages": "npm run build && node scripts/publish-pages.cjs"
+    "deploy:pages": "npm run build && node scripts/publish-pages.cjs",
+    "test:geography": "node scripts/test-geography.mjs",
+    "test:animations": "node scripts/test-animations.cjs"
   },
   "dependencies": {
     "d3-geo": "^3.1.1",

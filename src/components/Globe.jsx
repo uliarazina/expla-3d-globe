@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { geoEquirectangular, geoPath, geoArea } from 'd3-geo';
 import './Globe.css';
 import { createGlobeMaterial } from './globeMaterial.js';
@@ -11,9 +10,9 @@ export default function Globe({
   rotationPeriod = 20,
   paused = false,
   interactive = true,
-  landColor = '#00f58a',
-  oceanColor = '#111215',
-  borderColor = '#00e580',
+  landColor = '#03FA7F',
+  oceanColor = '#212121',
+  borderColor = '#02e573',
   relief = 0.012,
   rimStrength = 0.20,
   maxPixelRatio = 1.5,
@@ -37,7 +36,8 @@ export default function Globe({
     const abort = new AbortController();
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const resources = [];
-    let renderer, controls, resizeObserver, intersectionObserver;
+    let renderer, resizeObserver, intersectionObserver;
+    let removeInteraction = () => {};
     let disposed = false, frame = null, previousTime = null, inView = true;
     let elapsed = 0;
     const schedule = () => {
@@ -60,9 +60,8 @@ export default function Globe({
       // Keep the angle unwrapped, avoiding a discontinuity at the loop boundary.
       if (spinning) globe.rotation.y += (Math.PI * 2 / rotationPeriod) * delta;
       elapsed += delta;
-      controls.update();
       renderer.render(scene, camera);
-      onFrame?.({ timestamp, delta, elapsed, rotation: globe.rotation.y,
+      onFrame?.({ timestamp, delta, elapsed, rotation: globe.rotation.y, axisTilt: globe.rotation.x,
         drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles });
       if (spinning) schedule();
       else previousTime = null;
@@ -161,18 +160,39 @@ export default function Globe({
         globe = new THREE.Mesh(geometry, material);
         globe.rotation.set(0.5, -1.45, 0);
         scene.add(globe);
-        controls = new OrbitControls(camera, renderer.domElement);
-        controls.enabled = interactive;
-        controls.enableZoom = false; controls.enablePan = false;
-        controls.enableDamping = false; controls.autoRotate = false;
-        controls.rotateSpeed = 0.55;
-        controls.minPolarAngle = 0.15; controls.maxPolarAngle = Math.PI - 0.15;
-        controls.addEventListener('change', schedule);
         const canvas = renderer.domElement;
         canvas.setAttribute('role', 'img');
         canvas.setAttribute('aria-label', interactive
-          ? 'Animated globe. Drag or use arrow keys while focused to rotate.' : 'Animated globe.');
-        if (interactive) { canvas.tabIndex = 0; controls.listenToKeyEvents(canvas); }
+          ? 'Animated globe. Drag horizontally or use left and right arrow keys to turn it.' : 'Animated globe.');
+        if (interactive) {
+          canvas.tabIndex = 0;
+          let pointerId = null, lastX = 0;
+          const down = event => {
+            if (!event.isPrimary || event.button !== 0) return;
+            pointerId = event.pointerId; lastX = event.clientX;
+            canvas.setPointerCapture(pointerId);
+          };
+          const move = event => {
+            if (event.pointerId !== pointerId) return;
+            // Turn the object around its own fixed axis; never orbit the camera.
+            globe.rotation.y += (event.clientX - lastX) / Math.max(1, host.clientWidth) * Math.PI * 1.3;
+            lastX = event.clientX;
+            schedule();
+          };
+          const end = () => { pointerId = null; };
+          const key = event => {
+            if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+            event.preventDefault();
+            globe.rotation.y += (event.key === 'ArrowLeft' ? -1 : 1) * Math.PI / 18;
+            schedule();
+          };
+          const listeners = { pointerdown: down, pointermove: move, pointerup: end,
+            pointercancel: end, lostpointercapture: end, keydown: key };
+          for (const [type, listener] of Object.entries(listeners)) canvas.addEventListener(type, listener);
+          removeInteraction = () => {
+            for (const [type, listener] of Object.entries(listeners)) canvas.removeEventListener(type, listener);
+          };
+        }
         const resize = () => {
           const { width, height } = host.getBoundingClientRect();
           if (!width || !height) return;
@@ -204,7 +224,7 @@ export default function Globe({
       document.removeEventListener('visibilitychange', resetTime);
       motion.removeEventListener('change', resetTime);
       resizeObserver?.disconnect(); intersectionObserver?.disconnect();
-      controls?.dispose(); resources.forEach(resource => resource.dispose());
+      removeInteraction(); resources.forEach(resource => resource.dispose());
       renderer?.dispose(); renderer?.domElement.remove();
     };
   }, [dataUrl, interactive, landColor, oceanColor, borderColor, relief, rimStrength, maxPixelRatio, textureWidth]);

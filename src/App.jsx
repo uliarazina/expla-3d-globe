@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useId, useRef, useState } from 'react';
 import Globe from './components/Globe.jsx';
+import useReveal from './useReveal.js';
 
 const copy = {
   uk: {
@@ -80,6 +81,8 @@ export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [modal, setModal] = useState(null);
   const dialog = useRef(null);
+  const [reachRef, reachRevealed] = useReveal();
+  const ringGradient = `reach-ring-${useId().replaceAll(':', '')}`;
   const t = copy[language];
   useEffect(() => { document.documentElement.lang = language; }, [language]);
   useEffect(() => {
@@ -123,14 +126,22 @@ export default function App() {
           </article>)}</div>
         </div>
       </section>
-      <section className="reach container" aria-label={t.globe}>
-        <div className="reach-globe"><div className="globe-ring" aria-hidden="true"/><Globe dataUrl={`${import.meta.env.BASE_URL}data/countries.geojson`}/></div>
+      <section className={`reach container${reachRevealed ? ' is-revealed' : ''}`} ref={reachRef} aria-label={t.globe}>
+        <div className="reach-globe"><svg className="globe-ring" viewBox="0 0 100 100" aria-hidden="true">
+          <defs><linearGradient id={ringGradient} x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#20c57c"/><stop offset="100%" stopColor="#06492e"/></linearGradient></defs>
+          <circle className="ring-track" cx="50" cy="50" r="49"/>
+          <circle className="ring-progress" cx="50" cy="50" r="49" pathLength="100" transform="rotate(-90 50 50)" stroke={`url(#${ringGradient})`}/>
+        </svg><Globe dataUrl={`${import.meta.env.BASE_URL}data/countries.geojson`}/></div>
         <div className="reach-copy"><p className="reach-intro">{t.seen}</p><p className="reach-value">80<span>%</span></p><h2>{t.online}</h2>
-          <div className="reach-meter"><span className="meter-blocks" aria-hidden="true">{Array.from({ length: 10 }, (_, index) => <i key={index} className={index < 8 ? 'is-filled' : ''}/>)}</span><span>{t.users}</span></div>
+          <div className="reach-meter"><span className="meter-blocks" aria-hidden="true">{Array.from({ length: 10 }, (_, index) => <i key={index} className={index < 8 ? 'is-filled' : ''} style={{ '--cube-delay': `${index * 0.26}s` }}/>)}</span><span>{t.users}</span></div>
         </div>
       </section>
       <section className="channels" aria-labelledby="channels-title"><div className="container channels-heading"><p className="section-eyebrow"><i aria-hidden="true"/>{t.zone}</p><h2 id="channels-title">{t.channelsStart}<br/>{t.channelsEnd} <span>{t.result}</span></h2></div>
-        <div className="channel-strip">{['Google', 'Meta', 'Microsoft', 'Native Ads', 'TikTok', 'Snapchat'].map((name, index) => <div className="channel" key={name}><span className="channel-number">0{index + 1}</span><ChannelLogo name={name}/></div>)}</div>
+        <div className="channel-strip" tabIndex={0} role="region" aria-label={language === 'uk' ? 'Рекламні платформи' : 'Advertising platforms'}>
+          <div className="channel-track">{[0, 1].map(group => <div className={`channel-group${group ? ' channel-group--duplicate' : ''}`} key={group} aria-hidden={group ? true : undefined}>
+            {['Google', 'Meta', 'Microsoft', 'Native Ads', 'TikTok', 'Snapchat'].map((name, index) => <div className="channel" key={name}><span className="channel-number">0{index + 1}</span><ChannelLogo name={name}/></div>)}
+          </div>)}</div>
+        </div>
       </section>
     </main>
     <footer className="site-footer container"><Logo small/><div className="social-links">{['Facebook', 'Instagram', 'LinkedIn'].map(network => <button key={network} onClick={() => open({ type: 'social', network })}>{network}</button>)}</div></footer>

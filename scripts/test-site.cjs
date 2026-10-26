@@ -14,7 +14,7 @@ const { launch, baseURL } = require('./browser.cjs');
     await page.goto(baseURL);
     await page.getByRole('heading', { name: 'expla топ-100 партнерів' }).waitFor();
     assert.equal(await page.locator('.direction-card').count(), 4);
-    assert.equal(await page.locator('.channel').count(), 6);
+    assert.equal(await page.locator('.channel-group').first().locator('.channel').count(), 6);
     assert.equal(await page.locator('.meter-blocks .is-filled').count(), 8);
     for (let index = 0; index < 4; index++) {
       await page.locator('.detail-button').nth(index).click();

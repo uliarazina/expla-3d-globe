@@ -21,9 +21,9 @@ export default function CompanySection() {
       <Globe
         dataUrl="/data/countries.geojson"
         rotationPeriod={20}
-        landColor="#00f58a"
-        oceanColor="#111215"
-        borderColor="#00e580"
+        landColor="#03FA7F"
+        oceanColor="#212121"
+        borderColor="#02e573"
       />
     </div>
   );
@@ -62,27 +62,27 @@ No global Three.js scripts, external APIs, or credentials are needed. Mount once
 | `dataUrl` | `/data/countries.geojson` | GeoJSON asset URL. Use the supplied, filtered file. |
 | `rotationPeriod` | `20` | Seconds per revolution. Positive finite values animate; zero or negative values stop automatic rotation. |
 | `paused` | `false` | Stop automatic rotation without blocking manual interaction. Can be controlled by the host page. |
-| `interactive` | `true` | Enable mouse/touch dragging and focused arrow keys. Disabling it allows normal touch scrolling over the canvas. |
-| `landColor` | `#00f58a` | Polygon fill. |
-| `oceanColor` | `#111215` | Solid sphere color underneath polygons, including excluded areas. |
-| `borderColor` | `#00e580` | Included country outlines. |
+| `interactive` | `true` | Enable horizontal mouse/touch turns and left/right arrow keys. Vertical gestures scroll the page without tilting the globe; the camera never orbits. |
+| `landColor` | `#03FA7F` | Polygon fill. |
+| `oceanColor` | `#212121` | Solid sphere color underneath polygons, including excluded areas. |
+| `borderColor` | `#02e573` | Included country outlines. |
 | `relief` | `0.012` | Raised-land height relative to sphere radius, clamped to 0–0.03. Also controls coastline bevel/shadow strength. `0` removes relief. |
 | `rimStrength` | `0.20` | Soft white edge illumination, clamped to 0–1. `0` removes the rim. |
 | `maxPixelRatio` | `1.5` | Upper device-pixel-ratio limit. Use `1` to reduce fill cost on constrained devices. |
 | `textureWidth` | `2048` | Atlas width, clamped to 512–4096. The height is half the width. Higher values improve close-up boundaries at extra memory/startup cost. |
 | `className`, `style` | none | Apply host layout styles to the wrapper. |
 | `onReady` | none | Called after scene initialization. |
-| `onFrame` | none | Optional diagnostics callback with `timestamp` (rAF milliseconds), `delta`/`elapsed` (seconds), unwrapped `rotation` (radians), `drawCalls`, and `triangles`. Avoid setting React state every frame. |
+| `onFrame` | none | Optional diagnostics callback with `timestamp` (rAF milliseconds), `delta`/`elapsed` (seconds), unwrapped `rotation` and fixed `axisTilt` (radians), `drawCalls`, and `triangles`. Avoid setting React state every frame. |
 
 Changing pause, speed, or callbacks does not recreate the renderer. Changing geography, colors, relief, rim strength, quality, or interactivity recreates the scene and starts its orientation again. Treat those as initialization options when continuity matters.
 
 ## Motion and performance
 
-The animation uses `requestAnimationFrame` timestamps and `2π / rotationPeriod × deltaSeconds` to advance the sphere, independently of OrbitControls. The angle is never reset at the end of a revolution, and elapsed time is not clipped on slow frames. Automatic rotation continues during dragging, while controls change the viewing angle. Controls have no inertia, so paused and reduced-motion views settle immediately.
+The animation uses `requestAnimationFrame` timestamps and `2π / rotationPeriod × deltaSeconds` to advance the sphere, without OrbitControls. The angle is never reset at the end of a revolution, and elapsed time is not clipped on slow frames. Automatic rotation continues during horizontal dragging. Pointer and keyboard input add an angle to the globe itself; they never move the camera or change its fixed axis tilt. Vertical dragging does nothing to orientation, and vertical touch gestures can scroll the page. There is no inertia, so paused and reduced-motion views settle immediately.
 
 The browser schedules rendering at its available refresh rate; the component imposes no 30/60 FPS cap. Hardware-supported 60 FPS is the target, not a guarantee on software WebGL or busy mobile devices. A hidden tab or offscreen globe stops rendering and resets its time baseline on return, avoiding a catch-up jump. `prefers-reduced-motion: reduce` overrides automatic rotation, with live preference changes supported. Static views render on demand during resize and interaction.
 
-The scene uses one shader-driven sphere, one draw call, 6,016 triangles, and two one-time 2048×1024 atlases. The PNG reference is interpreted as bright green raised land over a dark, softly highlighted sphere. Broad lighting is calculated per vertex; coast bevels and nearby-land shadows are baked on the CPU rather than using shadow maps, per-frame geographic processing, or expensive per-pixel lighting. Vertex displacement is also calculated once on the CPU. The fragment shader combines two texture samples. Pixel density is capped, with no post-processing or per-frame React updates. Included country outlines are subtle green strokes baked into the color atlas. ResizeObserver keeps the sphere fitted to the parent. Geometry, materials, textures, controls, observers, listeners, requests, and the renderer are released on unmount.
+The scene uses one shader-driven sphere, one draw call, 6,016 triangles, and two one-time 2048×1024 atlases. The PNG reference is interpreted as bright green raised land over a dark, softly highlighted sphere. Broad lighting is calculated per vertex; coast bevels and nearby-land shadows are baked on the CPU rather than using shadow maps, per-frame geographic processing, or expensive per-pixel lighting. Vertex displacement is also calculated once on the CPU. The fragment shader combines two texture samples. Pixel density is capped, with no post-processing or per-frame React updates. Included country outlines are subtle green strokes baked into the color atlas. ResizeObserver keeps the sphere fitted to the parent. Geometry, materials, textures, observers, pointer/keyboard listeners, requests, and the renderer are released on unmount.
 
 The demo's `window.__globeFrame` / `window.__globeSamples` instrumentation belongs only to `src/main.jsx`; the component itself creates no globals. See `previews/performance.json` for measurements from this cloud browser, which uses SwiftShader software rendering rather than a hardware GPU.
 
@@ -90,4 +90,6 @@ The demo's `window.__globeFrame` / `window.__globeSamples` instrumentation belon
 
 The current appearance is reconstructed from the two PNG images supplied in chat on 2026-10-26, not from Figma layer metadata. The first contains the website context; the second isolates the globe. Land is saturated green, the ocean is nearly black with a broad soft highlight, and coastlines have a slight raised bevel. A directional rim lights the upper-left silhouette. The initial view frames the Atlantic, Europe, Africa, and the Americas. The surrounding progress ring and all page typography/statistics are intentionally omitted.
 
-Defaults are sampled/visually matched approximations (`#00f58a` land, `#111215` ocean, `#00e580` borders), not verified Figma design tokens. Lighting changes displayed pixel colors. Exact design tokens can replace these props later. Real GeoJSON replaces the reference's stylized geography, including the explicit RUS/BLR exclusions; those differences are intentional.
+Land `#03FA7F` and ocean `#212121` are the exact base-color values supplied by the user; border `#02e573` is a subtle derived outline. These values are not retrieved Figma design tokens. Lighting changes displayed pixel colors. Exact design tokens can replace these props later. Real GeoJSON replaces the reference's stylized geography, including the explicit RUS/BLR exclusions; those differences are intentional.
+
+Ukraine now includes Crimea and Sevastopol; see [geographic provenance](GEOGRAPHY.md). The stape.io reference could not be accessed (HTTP 403), so its rotation period has not been measured. The current default remains 20 seconds per turn and can be changed via `rotationPeriod`.

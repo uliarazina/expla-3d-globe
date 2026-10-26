@@ -1,7 +1,7 @@
 .expla-globe { position: relative; width: 100%; height: 100%; aspect-ratio: 1; background: transparent; }
 .expla-globe > canvas { display: block; width: 100%; height: 100%; }
 .expla-globe > canvas:active { cursor: grabbing; }
-.expla-globe > canvas:focus-visible { outline: 2px solid #86c9a0; outline-offset: -3px; }
+.expla-globe > canvas:focus-visible { outline: 2px solid #03FA7F; outline-offset: -3px; }
 .expla-globe__error { position: absolute; inset: 35% 10% auto; font: 14px/1.5 system-ui, sans-serif; color: inherit; }
 
-.expla-globe[data-interactive="true"] > canvas { touch-action: none; cursor: grab; }
+.expla-globe[data-interactive="true"] > canvas { touch-action: pan-y; cursor: grab; user-select: none; }

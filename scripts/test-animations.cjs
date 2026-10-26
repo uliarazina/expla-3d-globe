@@ -1,0 +1,40 @@
+const assert = require('node:assert/strict');
+const { launch, baseURL } = require('./browser.cjs');
+(async () => {
+  const browser = await launch();
+  try {
+    const page = await browser.newPage({ viewport: { width: 1085, height: 900 }, reducedMotion: 'no-preference' });
+    const errors = []; page.on('pageerror', e => errors.push(e.message));
+    await page.goto(baseURL);
+    assert.equal(await page.locator('.reach.is-revealed').count(), 0, 'stats wait below the fold');
+    assert.equal(await page.locator('.ring-progress').evaluate(e => getComputedStyle(e).strokeDashoffset), '100px');
+    await page.locator('.reach').scrollIntoViewIfNeeded();
+    await page.locator('.reach.is-revealed').waitFor();
+    await page.waitForTimeout(450);
+    const early = await page.locator('.meter-blocks .is-filled').evaluateAll(elements => elements.map(e => new DOMMatrixReadOnly(getComputedStyle(e, '::before').transform).d));
+    assert(early[0] > 0 && early[7] === 0, 'cubes fill progressively, not simultaneously');
+    const movingRing = await page.locator('.ring-progress').evaluate(e => parseFloat(getComputedStyle(e).strokeDashoffset));
+    assert(movingRing < 100 && movingRing > 20, 'ring progresses toward 80 percent');
+    await page.waitForTimeout(2800);
+    const final = await page.locator('.meter-blocks .is-filled').evaluateAll(elements => elements.map(e => new DOMMatrixReadOnly(getComputedStyle(e, '::before').transform).d));
+    assert.equal(final.length, 8); assert(final.every(value => value === 1));
+    assert.equal(await page.locator('.meter-blocks i:not(.is-filled)').count(), 2);
+    assert.equal(await page.locator('.ring-progress').evaluate(e => parseFloat(getComputedStyle(e).strokeDashoffset)), 20);
+    const track = page.locator('.channel-track');
+    const x1 = await track.evaluate(e => new DOMMatrixReadOnly(getComputedStyle(e).transform).m41);
+    await page.waitForTimeout(250);
+    const x2 = await track.evaluate(e => new DOMMatrixReadOnly(getComputedStyle(e).transform).m41);
+    assert(x2 > x1, 'logo marquee moves right');
+    assert.equal(await page.locator('.channel-group').first().innerHTML(), await page.locator('.channel-group').last().innerHTML(), 'identical groups make the loop seamless');
+    const card = page.locator('.direction-card').first();
+    await page.mouse.move(0, 0); await card.scrollIntoViewIfNeeded();
+    const width = (await card.boundingBox()).width;
+    await card.hover(); await page.waitForTimeout(350);
+    assert((await card.boundingBox()).width > width, 'direction card hover subtly enlarges the card');
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    assert.equal(await track.evaluate(e => getComputedStyle(e).animationName), 'none');
+    assert.equal(await page.locator('.ring-progress').evaluate(e => parseFloat(getComputedStyle(e).strokeDashoffset)), 20);
+    assert.deepEqual(errors, []);
+    console.log('PASS: one-time scroll reveal, sequential 8/10 cubes, 80% ring, rightward seamless logos, card hover, reduced motion.');
+  } finally { await browser.close(); }
+})().catch(e => { console.error(e); process.exitCode = 1; });
