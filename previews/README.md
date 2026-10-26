@@ -12,7 +12,7 @@ The replacement uses actual rAF time with no frame-delta clipping, one draw call
 
 ## Live browser measurements
 
-[`performance.json`](performance.json) records the latest smoke-test sample, collected for five seconds with **no screenshot or video capture running**. It includes actual rendered-frame FPS, p95 frame interval, verified rotation period, renderer identity, draw calls, and triangle count. The PNG-based relief shader measures approximately 21 FPS in the latest software-rendered cloud browser sample at an 800×800 viewport, DPR 1, and a 640×640 component. This is below the 60 FPS target, which has not been verified on hardware WebGL here. A prior simpler unlit version measured around 40 FPS on an earlier machine session; those observations are not a controlled GPU benchmark.
+[`performance.json`](performance.json) records the latest smoke-test sample, collected for five seconds with **no screenshot or video capture running**. It includes actual rendered-frame FPS, p95 frame interval, verified rotation period, renderer identity, draw calls, and triangle count. The PNG-based relief shader measures approximately 14 FPS in the latest software-rendered cloud browser sample at an 800×800 viewport, DPR 1, and a 640×640 component. This is below the 60 FPS target, which has not been verified on hardware WebGL here. A prior simpler unlit version measured around 40 FPS on an earlier machine session; those observations are not a controlled GPU benchmark.
 
 Run `npm run test:smoke` with the Vite server running to reproduce the test. Browser-performance results may vary with concurrent cloud load. Measurements are reported honestly rather than requiring unsupported 60 FPS on a software renderer. Test cases also force a long frame and validate the exact rotation increment, run through multiple revolution boundaries, and test motion preferences and interaction.
 
@@ -34,3 +34,5 @@ The appearance was updated from the supplied expla website and isolated-globe PN
 The latest preview uses horizontal-only interaction and corrected Ukraine geometry including Crimea. [Ukraine outline](ukraine-boundary.svg) is generated directly from the shipped geographic feature. The default turn remains 20 seconds because the stape.io reference was blocked by HTTP 403.
 
 The current globe has softer rim/specular highlights. The website previews now include the original uploaded SVG logo. [Mobile popup](expla-popup-mobile.png) and [desktop popup](expla-popup-desktop.png) show the layout based on the supplied mobile example, including the direction selector and white benefit cards.
+
+For image sharpness, use the full-size [Retina PNG](expla-globe-transparent.png); the MP4 is a smaller 640×640 motion reference. The latest globe uses a regular spherical mesh with shader coast relief, 4K atlases and a 2× pixel-density cap. The separate quality test measures its rendered alpha silhouette rather than inferring quality from a configuration setting.

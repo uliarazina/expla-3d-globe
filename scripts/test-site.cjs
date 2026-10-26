@@ -50,7 +50,7 @@ const { launch, baseURL } = require('./browser.cjs');
     await page.locator('.masthead').screenshot({ path: 'previews/expla-hero.png' });
     // Render the offscreen globe once before full-page capture; reduced motion keeps it still.
     await page.locator('.reach').scrollIntoViewIfNeeded();
-    await page.waitForSelector('canvas'); await page.waitForTimeout(600);
+    await page.waitForSelector('.reach-globe canvas'); await page.waitForTimeout(600);
     await page.evaluate(() => document.activeElement?.blur());
     await page.screenshot({ path: 'previews/expla-website-desktop.png', fullPage: true });
     for (const width of [320, 390, 768, 1440]) {

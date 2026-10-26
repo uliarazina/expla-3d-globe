@@ -21,6 +21,7 @@ npm run test:site
 npm run test:animations
 npm run test:interactions
 npm run test:design
+npm run test:quality
 npm run test:geography
 npm run test:smoke
 ```
@@ -38,3 +39,5 @@ Features with ISO alpha-3 codes `RUS` and `BLR` are absent from the shipped data
 The appearance follows the globe PNGs supplied in chat on 2026-10-26. The globe uses the user-provided base colors `#03FA7F` (land) and `#212121` (sphere); lighting modifies the final pixels. The original uploaded logo SVG is installed; the supplied e-Ukraine fonts are self-hosted. The emerald masthead background follows the screenshot and remains a procedural reconstruction rather than an exported Figma asset. The surrounding ring, website content, and statistics live in `src/App.jsx`, separate from the globe component.
 
 Ukraine includes Crimea and Sevastopol; [geography notes](docs/GEOGRAPHY.md) explain the corrected source assignment and regression checks.
+
+The globe uses 4K atlases, up to 2× Retina rendering, and a smooth spherical silhouette. Shader-based coast relief avoids displaced-vertex spikes. See the [high-resolution transparent globe](previews/expla-globe-transparent.png).

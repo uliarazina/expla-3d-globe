@@ -14,7 +14,8 @@
     "test:geography": "node scripts/test-geography.mjs",
     "test:animations": "node scripts/test-animations.cjs",
     "test:interactions": "node scripts/test-interactions.cjs",
-    "test:design": "node scripts/test-design.cjs"
+    "test:design": "node scripts/test-design.cjs",
+    "test:quality": "node scripts/test-globe-quality.cjs"
   },
   "dependencies": {
     "d3-geo": "^3.1.1",

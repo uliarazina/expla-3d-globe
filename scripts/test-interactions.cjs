@@ -18,9 +18,26 @@ const { launch, baseURL } = require('./browser.cjs');
 
     await page.waitForTimeout(500);
     const ambient = await background.screenshot(); await page.waitForTimeout(800);
-    assert(!ambient.equals(await background.screenshot()), 'hero shader drifts autonomously');
+    const idle = await background.screenshot();
+    assert(!ambient.equals(idle), 'hero shader drifts autonomously');
     await page.locator('.hero').hover({ position: { x: 200, y: 60 } }); await page.waitForTimeout(600);
-    assert(!ambient.equals(await background.screenshot()), 'hero shader responds to pointer movement');
+    const hover = await background.screenshot();
+    const difference = await page.evaluate(async images => {
+      const buffers = [];
+      for (const source of images) {
+        const image = new Image(); image.src = 'data:image/png;base64,' + source; await image.decode();
+        const canvas = document.createElement('canvas'); canvas.width = image.width; canvas.height = image.height;
+        const context = canvas.getContext('2d'); context.drawImage(image, 0, 0);
+        buffers.push(context.getImageData(0, 0, canvas.width, canvas.height).data);
+      }
+      const mean = (a, b) => {
+        let total = 0, count = 0;
+        for (let index = 0; index < a.length; index++) if (index % 4 !== 3) { total += Math.abs(a[index] - b[index]); count++; }
+        return total / count;
+      };
+      return { idle: mean(buffers[0], buffers[1]), hover: mean(buffers[1], buffers[2]) };
+    }, [ambient, idle, hover].map(buffer => buffer.toString('base64')));
+    assert(difference.hover > difference.idle * 1.4, `pointer motion exceeds ambient drift: ${JSON.stringify(difference)}`);
     const card = page.locator('.direction-card').first();
     await card.hover(); await page.waitForTimeout(350);
     assert.equal(await card.locator('.detail-button').evaluate(e => getComputedStyle(e).color), 'rgb(32, 197, 124)', 'the card highlights its CTA on hover');

@@ -66,13 +66,13 @@ No global Three.js scripts, external APIs, or credentials are needed. Mount once
 | `landColor` | `#03FA7F` | Polygon fill. |
 | `oceanColor` | `#212121` | Solid sphere color underneath polygons, including excluded areas. |
 | `borderColor` | `#02e573` | Included country outlines. |
-| `relief` | `0.012` | Raised-land height relative to sphere radius, clamped to 0–0.03. Also controls coastline bevel/shadow strength. `0` removes relief. |
+| `relief` | `0.012` | Shader coastline bevel/shadow strength, clamped to 0–0.03. `0` removes the relief illusion. Vertices stay on the sphere to prevent spikes. |
 | `rimStrength` | `0.025` | Soft white edge illumination, clamped to 0–1. `0` removes the rim. |
-| `maxPixelRatio` | `1.5` | Upper device-pixel-ratio limit. Use `1` to reduce fill cost on constrained devices. |
-| `textureWidth` | `2048` | Atlas width, clamped to 512–4096. The height is half the width. Higher values improve close-up boundaries at extra memory/startup cost. |
+| `maxPixelRatio` | `2` | Upper device-pixel-ratio limit. Use `1` to reduce fill cost on constrained devices. |
+| `textureWidth` | `4096` | Atlas width, clamped to 512–4096. The height is half the width. Higher values improve close-up boundaries at extra memory/startup cost. |
 | `className`, `style` | none | Apply host layout styles to the wrapper. |
 | `onReady` | none | Called after scene initialization. |
-| `onFrame` | none | Optional diagnostics callback with `timestamp` (rAF milliseconds), `delta`/`elapsed` (seconds), unwrapped `rotation` and fixed `axisTilt` (radians), `drawCalls`, and `triangles`. Avoid setting React state every frame. |
+| `onFrame` | none | Optional diagnostics callback with `timestamp` (rAF milliseconds), `delta`/`elapsed` (seconds), unwrapped `rotation` and fixed `axisTilt` (radians), `drawCalls`, `triangles`, `textureWidth`, and `pixelRatio`. Avoid setting React state every frame. |
 
 Changing pause, speed, or callbacks does not recreate the renderer. Changing geography, colors, relief, rim strength, quality, or interactivity recreates the scene and starts its orientation again. Treat those as initialization options when continuity matters.
 
@@ -82,7 +82,7 @@ The animation uses `requestAnimationFrame` timestamps and `2π / rotationPeriod 
 
 The browser schedules rendering at its available refresh rate; the component imposes no 30/60 FPS cap. Hardware-supported 60 FPS is the target, not a guarantee on software WebGL or busy mobile devices. A hidden tab or offscreen globe stops rendering and resets its time baseline on return, avoiding a catch-up jump. `prefers-reduced-motion: reduce` overrides automatic rotation, with live preference changes supported. Static views render on demand during resize and interaction.
 
-The scene uses one shader-driven sphere, one draw call, 6,016 triangles, and two one-time 2048×1024 atlases. The PNG reference is interpreted as bright green raised land over a dark, softly highlighted sphere. Broad lighting is calculated per vertex; coast bevels and nearby-land shadows are baked on the CPU rather than using shadow maps, per-frame geographic processing, or expensive per-pixel lighting. Vertex displacement is also calculated once on the CPU. The fragment shader combines two texture samples. Pixel density is capped, with no post-processing or per-frame React updates. Included country outlines are subtle green strokes baked into the color atlas. ResizeObserver keeps the sphere fitted to the parent. Geometry, materials, textures, observers, pointer/keyboard listeners, requests, and the renderer are released on unmount.
+The scene uses one shader-driven sphere, one draw call, 12,096 triangles, and two one-time 4096×2048 atlases (capped by the GPU texture limit). The PNG reference is interpreted as bright green raised land over a dark, softly highlighted sphere. Broad lighting is calculated per vertex; coast bevels and nearby-land shadows are baked on the CPU rather than using shadow maps, per-frame geographic processing, or expensive per-pixel lighting. The 96×64 geometry is a perfect sphere; coast relief is shaded rather than displacing sparse vertices, preventing the jagged silhouette. Both atlases use mip filtering; the color atlas uses capped anisotropic filtering for oblique coasts. Atlas preprocessing yields in small batches to avoid freezing the first-screen animation. The fragment shader combines two texture samples. Pixel density is capped, with no post-processing or per-frame React updates. Included country outlines are subtle green strokes baked into the color atlas. ResizeObserver keeps the sphere fitted to the parent. Geometry, materials, textures, observers, pointer/keyboard listeners, requests, and the renderer are released on unmount.
 
 The demo's `window.__globeFrame` / `window.__globeSamples` instrumentation belongs only to `src/main.jsx`; the component itself creates no globals. See `previews/performance.json` for measurements from this cloud browser, which uses SwiftShader software rendering rather than a hardware GPU.
 
@@ -95,3 +95,5 @@ Land `#03FA7F` and ocean `#212121` are the exact base-color values supplied by t
 Ukraine now includes Crimea and Sevastopol; see [geographic provenance](GEOGRAPHY.md). The stape.io reference could not be accessed (HTTP 403), so its rotation period has not been measured. The current default remains 20 seconds per turn and can be changed via `rotationPeriod`.
 
 Globe lighting was softened at the user’s request: the default rim is 0.025, the ocean specular coefficient is 0.008, the land specular coefficient is 0.002, and the coast highlight coefficient is 0.012. Base land/ocean colors and geography are unchanged.
+
+Quality defaults are now 4K atlases and up to 2× device pixel density. On constrained devices or when many globes are embedded, use `textureWidth={2048}` and `maxPixelRatio={1}` to reduce texture memory/fill cost. `npm run test:quality` verifies the actual Retina drawing buffer and texture dimensions, and measures the rendered circular alpha contour to catch spiky geometry regressions. It also captures the high-resolution transparent PNG.

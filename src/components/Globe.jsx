@@ -15,8 +15,8 @@ export default function Globe({
   borderColor = '#02e573',
   relief = 0.012,
   rimStrength = 0.025,
-  maxPixelRatio = 1.5,
-  textureWidth = 2048,
+  maxPixelRatio = 2,
+  textureWidth = 4096,
   className = '',
   style,
   onFrame,
@@ -48,7 +48,7 @@ export default function Globe({
 
     function render(timestamp) {
       frame = null;
-      if (disposed || !renderer || document.hidden || !inView) {
+      if (disposed || !renderer || !globe || document.hidden || !inView) {
         previousTime = null;
         return;
       }
@@ -62,7 +62,8 @@ export default function Globe({
       elapsed += delta;
       renderer.render(scene, camera);
       onFrame?.({ timestamp, delta, elapsed, rotation: globe.rotation.y, axisTilt: globe.rotation.x,
-        drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles });
+        drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles,
+        textureWidth: globe.material.uniforms.colorMap.value.image.width, pixelRatio: renderer.getPixelRatio() });
       if (spinning) schedule();
       else previousTime = null;
     }
@@ -86,7 +87,10 @@ export default function Globe({
             if ((index === 0 && area > 2 * Math.PI) || (index > 0 && area < 2 * Math.PI)) ring.reverse();
           });
         }
-        const width = Math.min(4096, Math.max(512, Math.round(textureWidth)));
+        renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'low-power' });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, Math.max(1, maxPixelRatio)));
+        renderer.setClearColor(0x000000, 0);
+        const width = Math.min(renderer.capabilities.maxTextureSize, 4096, Math.max(512, Math.round(textureWidth)));
         const atlas = document.createElement('canvas');
         atlas.width = width; atlas.height = width / 2;
         const context = atlas.getContext('2d');
@@ -114,12 +118,20 @@ export default function Globe({
         const raw = pixels.data.slice();
         const height = mask.height;
         const coverage = (x, y) => raw[(Math.max(0, Math.min(height - 1, y)) * width + (x + width) % width) * 4];
-        // Prebake the coast bevel and shadow instead of doing six texture lookups per fragment.
-        for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {
-          const offset = (y * width + x) * 4;
-          pixels.data[offset + 1] = Math.round(127.5 + (coverage(x + 1, y) - coverage(x - 1, y)) / 2);
-          pixels.data[offset + 2] = Math.round(127.5 + (coverage(x, y - 1) - coverage(x, y + 1)) / 2);
-          pixels.data[offset + 3] = coverage(x - 2, y - 2);
+        // Keep bevel width constant in geographic space as atlas quality increases.
+        const bevelStep = Math.max(1, Math.round(width / 2048));
+        // Yield between rows so the higher-resolution atlas does not freeze the hero.
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            const offset = (y * width + x) * 4;
+            pixels.data[offset + 1] = Math.round(127.5 + (coverage(x + bevelStep, y) - coverage(x - bevelStep, y)) / 2);
+            pixels.data[offset + 2] = Math.round(127.5 + (coverage(x, y - bevelStep) - coverage(x, y + bevelStep)) / 2);
+            pixels.data[offset + 3] = coverage(x - 2 * bevelStep, y - 2 * bevelStep);
+          }
+          if ((y + 1) % 64 === 0) {
+            await new Promise(resolve => setTimeout(resolve, 0));
+            if (disposed) return;
+          }
         }
         // Typed data preserves all four independent channels, including RGB where A=0.
         const packed = new Uint8Array(pixels.data.length);
@@ -127,16 +139,16 @@ export default function Globe({
           packed.set(pixels.data.subarray(y * width * 4, (y + 1) * width * 4), (height - 1 - y) * width * 4);
         }
         const reliefMap = new THREE.DataTexture(packed, width, height, THREE.RGBAFormat);
-        reliefMap.minFilter = THREE.LinearFilter;
+        reliefMap.generateMipmaps = true;
+        reliefMap.minFilter = THREE.LinearMipmapLinearFilter;
+        reliefMap.wrapS = THREE.RepeatWrapping;
         reliefMap.magFilter = THREE.LinearFilter;
         reliefMap.needsUpdate = true;
         resources.push(reliefMap);
         const texture = new THREE.CanvasTexture(atlas);
         texture.colorSpace = THREE.SRGBColorSpace;
         resources.push(texture);
-        renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'low-power' });
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, Math.max(1, maxPixelRatio)));
-        renderer.setClearColor(0x000000, 0);
+        texture.wrapS = THREE.RepeatWrapping;
         texture.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
         host.appendChild(renderer.domElement);
         scene = new THREE.Scene();
@@ -144,15 +156,9 @@ export default function Globe({
         camera.position.set(0, 0, 3.7);
         // One draw call, no shadow maps or post-processing. Relief is continuous,
         // so excluded geography exposes the intact sphere rather than cutting holes.
-        const geometry = new THREE.SphereGeometry(1, 64, 48);
-        const positions = geometry.attributes.position;
-        const uv = geometry.attributes.uv;
-        for (let index = 0; index < positions.count; index++) {
-          const land = coverage(Math.round(uv.getX(index) * (width - 1)), Math.round((1 - uv.getY(index)) * (height - 1))) / 255;
-          const scale = 1 + land * Math.max(0, Math.min(0.03, relief));
-          positions.setXYZ(index, positions.getX(index) * scale, positions.getY(index) * scale, positions.getZ(index) * scale);
-        }
-        geometry.computeBoundingSphere();
+        // A smooth sphere keeps its silhouette intact. Coast relief belongs in the
+        // shader: sampling a coarse height grid displaced isolated vertices into spikes.
+        const geometry = new THREE.SphereGeometry(1, 96, 64);
         const material = createGlobeMaterial({ colorMap: texture, reliefMap,
           textureWidth: width, relief: Math.max(0, Math.min(0.03, relief)),
           rimStrength: Math.max(0, Math.min(1, rimStrength)) });
