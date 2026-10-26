@@ -15,7 +15,7 @@
 @media(max-width:520px){.reach{grid-template-columns:minmax(0,1fr)}}
 /* Scroll-triggered statistics, once per visit. */
 .globe-ring{display:block;background:none;mask:none;-webkit-mask:none;overflow:visible}
-.globe-ring circle{fill:none;stroke-width:1.8}.ring-track{stroke:#29292d}.ring-progress{stroke-dasharray:none;stroke-dashoffset:0;transition:none}
+.globe-ring circle{fill:none;stroke-width:1.8}.ring-progress{stroke-dasharray:none;stroke-dashoffset:0;transition:none}
 .reach.is-revealed .ring-progress{stroke-dashoffset:0}
 .meter-blocks i,.meter-blocks i.is-filled{position:relative;overflow:hidden;background:#3a3a3f}
 .meter-blocks i.is-filled::before{content:'';position:absolute;inset:0;background:var(--green);transform:scaleY(0);transform-origin:bottom;transition:transform .55s cubic-bezier(.22,.7,.25,1);transition-delay:var(--cube-delay)}
@@ -58,7 +58,7 @@
 
 /* The screenshot's emerald image treatment extends behind navigation and hero. */
 .masthead{position:relative;background:#010906}.masthead>.hero-background{inset:0;z-index:0}.masthead .site-header,.masthead .hero{position:relative;z-index:1}.masthead .hero{isolation:auto}
-.globe-ring .ring-inner{stroke:#4c5750;stroke-width:1.1;opacity:.8}
+
 @media(prefers-reduced-motion:reduce){.masthead>.hero-background{opacity:1}}
 
 /* Keep the mobile navigation above the new first-screen background and title. */
@@ -68,3 +68,10 @@
 
 .skip-link{opacity:0;pointer-events:none}.skip-link:focus{opacity:1;pointer-events:auto}
 @media(max-width:600px){.direction-dialog .dialog-benefits h4{font-size:21px;line-height:1.25}}
+
+/* Extend the real shader surface through the entire angled cutout. The equal
+   overlap keeps the directions section in place while removing the black wedge. */
+:root{--masthead-notch:clamp(20px,3.2vw,56px)}
+.masthead{padding-bottom:var(--masthead-notch)}
+.masthead+main>.directions{margin-top:calc(-18px - var(--masthead-notch));clip-path:polygon(0 0,65% var(--masthead-notch),100% 0,100% 100%,35% calc(100% - 32px),0 100%)}
+@media(max-width:760px){:root{--masthead-notch:20px}.masthead+main>.directions{clip-path:polygon(0 0,65% var(--masthead-notch),100% 0,100% 100%,35% calc(100% - 20px),0 100%)}}

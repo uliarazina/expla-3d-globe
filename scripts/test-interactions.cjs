@@ -11,6 +11,11 @@ const { launch, baseURL } = require('./browser.cjs');
     const fieldBounds = await background.boundingBox();
     const navBounds = await page.locator('.site-header').boundingBox();
     assert(fieldBounds.y <= navBounds.y && fieldBounds.width >= navBounds.width, 'emerald field also covers the header');
+    // Resolve the CSS length against the actual clip-path (clamp may be unevaluated in a variable).
+    const notch = await page.locator('.directions').evaluate(e => parseFloat(getComputedStyle(e).clipPath.match(/65% ([\d.]+)px/)[1]));
+    const directionsBox = await page.locator('.directions').boundingBox();
+    assert(fieldBounds.y + fieldBounds.height >= directionsBox.y + notch, 'the shader covers the sharp corner completely');
+
     await page.waitForTimeout(500);
     const ambient = await background.screenshot(); await page.waitForTimeout(800);
     assert(!ambient.equals(await background.screenshot()), 'hero shader drifts autonomously');

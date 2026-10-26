@@ -57,6 +57,12 @@ const { launch, baseURL } = require('./browser.cjs');
       await page.setViewportSize({ width, height: 844 });
       await page.waitForTimeout(250);
       assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `horizontal overflow at ${width}`);
+      assert(await page.evaluate(() => {
+        const field = document.querySelector('.hero-background canvas').getBoundingClientRect();
+        const section = document.querySelector('.directions');
+        const notch = parseFloat(getComputedStyle(section).clipPath.match(/65% ([\d.]+)px/)[1]);
+        return field.bottom >= section.getBoundingClientRect().top + notch;
+      }), `shader covers the angled corner at ${width}`);
     }
     await page.setViewportSize({ width: 390, height: 844 }); await page.waitForTimeout(250);
     await page.evaluate(() => scrollTo(0, 0));

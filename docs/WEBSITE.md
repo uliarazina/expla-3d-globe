@@ -42,7 +42,7 @@ A pushed branch does not prove Pages is enabled or the URL is live. This cloud e
 
 ## Current motion and interactions
 
-The globe ring is a static, closed green outline with a muted inner rim, following the supplied screenshot; it is decorative rather than an 80% progress arc. Only the eight-of-ten cubes animate on the reach section's first viewport entry, with staggered bottom-to-top fills. Reduced-motion users see the final cube state immediately.
+The globe ring is a static, closed green gradient outline without gray inner or backing rings, following the supplied screenshot; it is decorative rather than an 80% progress arc. Only the eight-of-ten cubes animate on the reach section's first viewport entry, with staggered bottom-to-top fills. Reduced-motion users see the final cube state immediately.
 
 Holding the primary pointer pauses globe auto-rotation. Horizontal manual turning still works; release, cancellation, or loss of window focus resumes rotation with a fresh timestamp baseline, avoiding catch-up jumps. Vertical gestures do not tilt the globe.
 
@@ -69,3 +69,9 @@ The current Figma background (`6176:31760`), direction-popup (`6176:31485`), and
 The six original OTF files from the user-uploaded `e-Ukraine-20261026T185604Z-1-001.zip` are self-hosted under `src/assets/fonts`: Thin (100), UltraLight (200), Light (300), Regular (400), Medium (500), and Bold (700). They are loaded through `@font-face` with `font-display: swap`, without external font services. Vite fingerprints the files and rewrites their URLs for subdirectory hosting. The original outlined SVG logo remains independent of the website font.
 
 The popup close control has a vector cross; hover/focus uses the existing green brand accent. This state is implemented and tested, but its exact Figma hover frame remains unavailable through the connected tools. The mobile header stacking order keeps the open menu above the hero text and background.
+
+## Full angled shader surface and reference website
+
+The shader canvas includes the masthead's full lower angled region. Responsive padding and an equal negative overlap keep the page sections in place while ensuring the clipped green section cannot expose an unshaded black triangle. Background motion includes slow autonomous drift/rotation as well as damped pointer interaction; reduced motion stays static. Responsive tests check coverage at 320, 390, 768, and 1440px.
+
+`https://expla.com/ua/` is the company reference website, not this repository's deployment target. The user clarified that the official website must not be modified. This repository continues to publish its preview through GitHub Pages. Reading the official reference returned a proxy HTTP 403, so header/footer contact details and destination URLs beyond those already supplied cannot be verified or copied here. They should be supplied directly rather than invented.

@@ -6,6 +6,8 @@ const { launch, baseURL } = require('./browser.cjs');
     const page = await browser.newPage({ viewport: { width: 1085, height: 900 }, reducedMotion: 'no-preference' });
     const errors = []; page.on('pageerror', e => errors.push(e.message));
     await page.goto(baseURL);
+    assert.equal(await page.locator('.globe-ring circle').count(), 1, 'only the gradient outline remains');
+    assert.equal(await page.locator('.ring-inner,.ring-track').count(), 0, 'gray rings are removed');
     assert.equal(await page.locator('.reach.is-revealed').count(), 0, 'cubes wait below the fold');
     assert.equal(await page.locator('.ring-progress').evaluate(e => getComputedStyle(e).strokeDashoffset), '0px');
     await page.locator('.reach').scrollIntoViewIfNeeded();

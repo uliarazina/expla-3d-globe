@@ -36,10 +36,10 @@ export default function HeroBackground() {
       renderer.domElement.setAttribute('aria-hidden', 'true'); host.appendChild(renderer.domElement);
       scene = new THREE.Scene(); camera = new THREE.Camera(); geometry = new THREE.PlaneGeometry(2, 2);
       material = new THREE.ShaderMaterial({
-        uniforms: { time: { value: 0 }, aspect: { value: 1 }, pointer: { value: new THREE.Vector2(.5, .5) }, activity: { value: 0 }, base: { value: new THREE.Color('#0e0e12') } },
+        uniforms: { time: { value: 0 }, aspect: { value: 1 }, pointer: { value: new THREE.Vector2(.5, .5) }, activity: { value: 0 } },
         vertexShader: 'varying vec2 uvPosition; void main(){uvPosition=uv;gl_Position=vec4(position,1.0);}',
         fragmentShader: `
-          uniform float time, aspect, activity; uniform vec2 pointer; uniform vec3 base;
+          uniform float time, aspect, activity; uniform vec2 pointer;
           varying vec2 uvPosition;
           float ribbon(vec2 uv, float anchor, float bend, float phase){
             float center=anchor+bend*(uv.y-.5)+.045*sin(uv.y*5.0+phase);
@@ -51,11 +51,12 @@ export default function HeroBackground() {
             vec2 p=(uvPosition-.5)*vec2(aspect,1.0);
             vec2 mouse=(pointer-.5)*vec2(aspect,1.0);
             float radius=length(p-mouse);
-            float t=time*.065;
-            float angle=activity*exp(-radius*radius*1.5)*sin(t+radius*4.0)*.65;
+            float t=time*.10;
+            float angle=sin(t*.7)*.035+activity*exp(-radius*radius*1.5)*sin(t+radius*4.0)*.65;
             mat2 turn=mat2(cos(angle),-sin(angle),sin(angle),cos(angle));
             p=mouse+turn*(p-mouse);
             vec2 uv=p/vec2(aspect,1.0)+.5;
+            uv+=vec2(.008*sin(t*.6+uv.y*4.0),.006*sin(t*.4+uv.x*3.0));
             float streams=ribbon(uv,.06,.24,t)+ribbon(uv,.17,.18,t+1.4)*.8
               +ribbon(uv,.28,.13,t+3.0)*.55+ribbon(uv,.80,.25,t+1.0)
               +ribbon(uv,.94,.20,t+3.8)*.7;

@@ -130,7 +130,6 @@ export default function App() {
       <section className={`reach container${reachRevealed ? ' is-revealed' : ''}`} ref={reachRef} aria-label={t.globe}>
         <div className="reach-globe"><svg className="globe-ring" viewBox="0 0 100 100" aria-hidden="true">
           <defs><linearGradient id={ringGradient} x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#20c57c"/><stop offset="55%" stopColor="#138353"/><stop offset="100%" stopColor="#06492e"/></linearGradient></defs>
-          <circle className="ring-track" cx="50" cy="50" r="49"/><circle className="ring-inner" cx="50" cy="50" r="46.5"/>
           <circle className="ring-progress" cx="50" cy="50" r="49" pathLength="100" stroke={`url(#${ringGradient})`}/>
         </svg><Globe dataUrl={`${import.meta.env.BASE_URL}data/countries.geojson`}/></div>
         <div className="reach-copy"><p className="reach-intro">{t.seen}</p><p className="reach-value">80<span>%</span></p><h2>{t.online}</h2>
