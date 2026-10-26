@@ -1,6 +1,6 @@
 # expla website & globe
 
-A standalone React + Three.js globe with a transparent background, bright green raised country polygons and a softly lit black sphere, a continuous 20-second rotation, horizontal-only drag/touch/keyboard interaction, and reduced-motion support. The default page now reproduces the full website screenshot. Use `?view=globe` for the isolated component preview. The reusable globe itself still contains no labels or website UI.
+A standalone React + Three.js globe with a transparent background, bright green raised country polygons and a softly lit black sphere, a continuous 40-second rotation, horizontal-only drag/touch/keyboard interaction, and reduced-motion support. The default page now reproduces the full website screenshot. Use `?view=globe` for the isolated component preview. The reusable globe itself still contains no labels or website UI.
 
 - **Website and publication:** [Full-site guide](docs/WEBSITE.md)
 - **Integrate:** [Developer handoff](docs/INTEGRATION.md)

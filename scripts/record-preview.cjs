@@ -39,7 +39,7 @@ const { spawnSync } = require('node:child_process');
     }
     if (hashes.size !== 300) throw new Error(`Only ${hashes.size}/300 frames are distinct`);
     const period = 2 * Math.PI * ((last.timestamp - first.timestamp) / 1000) / (last.rotation - first.rotation);
-    if (Math.abs(period - 20) > 0.001) throw new Error(`Unexpected recording period: ${period}`);
+    if (Math.abs(period - 40) > 0.001) throw new Error(`Unexpected recording period: ${period}`);
     mkdirSync('previews', { recursive: true });
     const result = spawnSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', '-framerate', '30', '-i', join(directory, '%04d.jpg'), '-frames:v', '300', '-c:v', 'libx264', '-preset', 'slow', '-crf', '18', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', 'previews/expla-globe-30fps.mp4'], { stdio: 'inherit' });
     if (result.status !== 0) throw new Error('ffmpeg encoding failed; ffmpeg must be installed');

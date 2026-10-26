@@ -7,13 +7,13 @@ import { createGlobeMaterial } from './globeMaterial.js';
 /** Standalone, transparent globe. The parent controls its size. */
 export default function Globe({
   dataUrl = '/data/countries.geojson',
-  rotationPeriod = 20,
+  rotationPeriod = 40,
   paused = false,
   interactive = true,
   landColor = '#03FA7F',
   oceanColor = '#212121',
   borderColor = '#02e573',
-  relief = 0.012,
+  relief = 0.008,
   rimStrength = 0.025,
   maxPixelRatio = 2,
   textureWidth = 4096,
@@ -95,7 +95,7 @@ export default function Globe({
         atlas.width = width; atlas.height = width / 2;
         const context = atlas.getContext('2d');
         context.fillStyle = oceanColor; context.fillRect(0, 0, width, width / 2);
-        const projection = geoEquirectangular().scale(width / (2 * Math.PI)).translate([width / 2, width / 4]);
+        const projection = geoEquirectangular().precision(0.1).scale(width / (2 * Math.PI)).translate([width / 2, width / 4]);
         const path = geoPath(projection, context);
         context.fillStyle = landColor; context.strokeStyle = borderColor;
         context.lineWidth = width / 4096 * 1.5;
@@ -149,7 +149,7 @@ export default function Globe({
         texture.colorSpace = THREE.SRGBColorSpace;
         resources.push(texture);
         texture.wrapS = THREE.RepeatWrapping;
-        texture.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
+        texture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
         host.appendChild(renderer.domElement);
         scene = new THREE.Scene();
         camera = new THREE.PerspectiveCamera(34, 1, 0.1, 20);
@@ -158,7 +158,7 @@ export default function Globe({
         // so excluded geography exposes the intact sphere rather than cutting holes.
         // A smooth sphere keeps its silhouette intact. Coast relief belongs in the
         // shader: sampling a coarse height grid displaced isolated vertices into spikes.
-        const geometry = new THREE.SphereGeometry(1, 96, 64);
+        const geometry = new THREE.SphereGeometry(1, 128, 96);
         const material = createGlobeMaterial({ colorMap: texture, reliefMap,
           textureWidth: width, relief: Math.max(0, Math.min(0.03, relief)),
           rimStrength: Math.max(0, Math.min(1, rimStrength)) });

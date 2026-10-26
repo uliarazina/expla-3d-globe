@@ -20,7 +20,7 @@ export default function CompanySection() {
     <div style={{ width: '100%', maxWidth: 560, aspectRatio: '1' }}>
       <Globe
         dataUrl="/data/countries.geojson"
-        rotationPeriod={20}
+        rotationPeriod={40}
         landColor="#03FA7F"
         oceanColor="#212121"
         borderColor="#02e573"
@@ -60,13 +60,13 @@ No global Three.js scripts, external APIs, or credentials are needed. Mount once
 | Prop | Default | Purpose |
 | --- | --- | --- |
 | `dataUrl` | `/data/countries.geojson` | GeoJSON asset URL. Use the supplied, filtered file. |
-| `rotationPeriod` | `20` | Seconds per revolution. Positive finite values animate; zero or negative values stop automatic rotation. |
+| `rotationPeriod` | `40` | Seconds per revolution. Positive finite values animate; zero or negative values stop automatic rotation. |
 | `paused` | `false` | Stop automatic rotation without blocking manual interaction. Can be controlled by the host page. |
 | `interactive` | `true` | Enable horizontal mouse/touch turns and left/right arrow keys. Vertical gestures scroll the page without tilting the globe; the camera never orbits. |
 | `landColor` | `#03FA7F` | Polygon fill. |
 | `oceanColor` | `#212121` | Solid sphere color underneath polygons, including excluded areas. |
 | `borderColor` | `#02e573` | Included country outlines. |
-| `relief` | `0.012` | Shader coastline bevel/shadow strength, clamped to 0–0.03. `0` removes the relief illusion. Vertices stay on the sphere to prevent spikes. |
+| `relief` | `0.008` | Shader coastline bevel/shadow strength, clamped to 0–0.03. `0` removes the relief illusion. Vertices stay on the sphere to prevent spikes. |
 | `rimStrength` | `0.025` | Soft white edge illumination, clamped to 0–1. `0` removes the rim. |
 | `maxPixelRatio` | `2` | Upper device-pixel-ratio limit. Use `1` to reduce fill cost on constrained devices. |
 | `textureWidth` | `4096` | Atlas width, clamped to 512–4096. The height is half the width. Higher values improve close-up boundaries at extra memory/startup cost. |
@@ -82,7 +82,7 @@ The animation uses `requestAnimationFrame` timestamps and `2π / rotationPeriod 
 
 The browser schedules rendering at its available refresh rate; the component imposes no 30/60 FPS cap. Hardware-supported 60 FPS is the target, not a guarantee on software WebGL or busy mobile devices. A hidden tab or offscreen globe stops rendering and resets its time baseline on return, avoiding a catch-up jump. `prefers-reduced-motion: reduce` overrides automatic rotation, with live preference changes supported. Static views render on demand during resize and interaction.
 
-The scene uses one shader-driven sphere, one draw call, 12,096 triangles, and two one-time 4096×2048 atlases (capped by the GPU texture limit). The PNG reference is interpreted as bright green raised land over a dark, softly highlighted sphere. Broad lighting is calculated per vertex; coast bevels and nearby-land shadows are baked on the CPU rather than using shadow maps, per-frame geographic processing, or expensive per-pixel lighting. The 96×64 geometry is a perfect sphere; coast relief is shaded rather than displacing sparse vertices, preventing the jagged silhouette. Both atlases use mip filtering; the color atlas uses capped anisotropic filtering for oblique coasts. Atlas preprocessing yields in small batches to avoid freezing the first-screen animation. The fragment shader combines two texture samples. Pixel density is capped, with no post-processing or per-frame React updates. Included country outlines are subtle green strokes baked into the color atlas. ResizeObserver keeps the sphere fitted to the parent. Geometry, materials, textures, observers, pointer/keyboard listeners, requests, and the renderer are released on unmount.
+The scene uses one shader-driven sphere, one draw call, 24,320 triangles, and two one-time 4096×2048 atlases (capped by the GPU texture limit). The PNG reference is interpreted as bright green raised land over a dark, softly highlighted sphere. Broad lighting is calculated per vertex; coast bevels and nearby-land shadows are baked on the CPU rather than using shadow maps, per-frame geographic processing, or expensive per-pixel lighting. The 128×96 geometry is a perfect sphere; coast relief is shaded rather than displacing sparse vertices, preventing the jagged silhouette. Both atlases use mip filtering; the color atlas uses capped anisotropic filtering for oblique coasts. Atlas preprocessing yields in small batches to avoid freezing the first-screen animation. The fragment shader combines two texture samples. Pixel density is capped, with no post-processing or per-frame React updates. Included country outlines are subtle green strokes baked into the color atlas. ResizeObserver keeps the sphere fitted to the parent. Geometry, materials, textures, observers, pointer/keyboard listeners, requests, and the renderer are released on unmount.
 
 The demo's `window.__globeFrame` / `window.__globeSamples` instrumentation belongs only to `src/main.jsx`; the component itself creates no globals. See `previews/performance.json` for measurements from this cloud browser, which uses SwiftShader software rendering rather than a hardware GPU.
 
@@ -92,7 +92,7 @@ The current appearance is reconstructed from the two PNG images supplied in chat
 
 Land `#03FA7F` and ocean `#212121` are the exact base-color values supplied by the user; border `#02e573` is a subtle derived outline. These values are not retrieved Figma design tokens. Lighting changes displayed pixel colors. Exact design tokens can replace these props later. Real GeoJSON replaces the reference's stylized geography, including the explicit RUS/BLR exclusions; those differences are intentional.
 
-Ukraine now includes Crimea and Sevastopol; see [geographic provenance](GEOGRAPHY.md). The stape.io reference could not be accessed (HTTP 403), so its rotation period has not been measured. The current default remains 20 seconds per turn and can be changed via `rotationPeriod`.
+Ukraine now includes Crimea and Sevastopol; see [geographic provenance](GEOGRAPHY.md). The stape.io reference could not be accessed (HTTP 403), so its rotation period has not been measured. The current default is 40 seconds per turn and can be changed via `rotationPeriod`.
 
 Globe lighting was softened at the user’s request: the default rim is 0.025, the ocean specular coefficient is 0.008, the land specular coefficient is 0.002, and the coast highlight coefficient is 0.012. Base land/ocean colors and geography are unchanged.
 

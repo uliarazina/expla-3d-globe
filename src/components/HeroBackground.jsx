@@ -61,22 +61,23 @@ export default function HeroBackground() {
             uv+=vec2(.025*sin(t*.8+uv.y*4.0),.018*sin(t*.6+uv.x*3.0));
             // Curved, feathered aurora arcs follow the supplied wide reference:
             // a bright lower-left sweep and a taller upper-right crescent.
-            vec2 rightCenter=vec2(.56+.018*sin(t*.5),.95);
-            float rightRadius=length((uv-rightCenter)/vec2(.36,.98));
-            float rightSide=smoothstep(-.10,.10,uv.x-rightCenter.x);
-            float rightFlow=.72+.28*sin(uv.y*6.0-t*1.4);
-            float right=(band(rightRadius-1.0,.10)+.32*band(rightRadius-.975-.006*sin(t),.012)
-              +.20*band(rightRadius-1.045,.018))*rightSide*rightFlow;
-            float leftRadius=length((uv-vec2(.37,.05))/vec2(.37,1.2));
-            float leftSide=1.0-smoothstep(.28,.5,uv.x);
-            float left=(band(leftRadius-1.0,.13)+.18*band(leftRadius-.94,.014))
-              *leftSide*(.35+.65*(1.0-uv.y));
-            float leftGlow=band(uv.x-.015,.16)*(.3+.7*(1.0-uv.y));
-            float center=(uvPosition.x-.5)/.23;
-            float readability=1.0-.65*exp(-center*center);
-            float hover=1.0+activity*.8*exp(-radius*2.0);
-            vec3 emerald=vec3(.0008,.053,.027)*right+vec3(.0006,.040,.024)*left
-              +vec3(.0002,.025,.016)*leftGlow;
+            // Broad lower emerald sweep, fine inner filaments and a dark center.
+            vec2 center=vec2(.53+.012*sin(t*.5),.78+.012*cos(t*.4));
+            vec2 q=(uv-center)/vec2(.57,.90);
+            float r=length(q);
+            float flow=.85+.15*sin(atan(q.y,q.x)*3.0-t*.6);
+            float lower=1.0-smoothstep(.20,.95,uv.y);
+            float outer=band(r-1.0,.18)*flow;
+            float threads=.25*band(r-.88-.009*sin(t+uv.x*6.0),.012)
+              +.16*band(r-.93,.018)+.12*band(r-.72,.008);
+            float leftArc=length((uv-vec2(.34,.12))/vec2(.38,.95));
+            float upperLeft=band(leftArc-1.0,.08)*smoothstep(.45,1.0,uv.y);
+            float corner=band(uv.x,.17)*(1.0-uv.y);
+            float readability=1.0-.72*exp(-pow((uvPosition.x-.5)/.24,2.0));
+            float hover=1.0+activity*.65*exp(-radius*2.0);
+            vec3 emerald=vec3(.0007,.095,.052)*outer*(.28+.72*lower)
+              +vec3(.0004,.038,.023)*threads
+              +vec3(.0003,.035,.021)*upperLeft+vec3(.0002,.035,.023)*corner;
             gl_FragColor=vec4(vec3(.0003,.0009,.0006)+emerald*readability*hover,1.0);
             #include <colorspace_fragment>
           }

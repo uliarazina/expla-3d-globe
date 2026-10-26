@@ -6,6 +6,6 @@
   "uniqueBrowserFrames": 300,
   "width": 640,
   "height": 640,
-  "rotationPeriodSeconds": 19.99999999999999,
+  "rotationPeriodSeconds": 40.00000000000014,
   "method": "Actual Chromium WebGL frames rendered offline with exact 30 Hz requestAnimationFrame timestamps. No interpolation or duplicated frames. This is not a real-time FPS benchmark."
 }

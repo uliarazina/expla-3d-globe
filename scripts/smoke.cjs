@@ -31,7 +31,7 @@ const { launch, baseURL } = require('./browser.cjs');
         drawCalls: frames.at(-1).drawCalls, triangles: frames.at(-1).triangles,
         renderer: debug ? gl.getParameter(debug.UNMASKED_RENDERER_WEBGL) : 'unknown' };
     });
-    assert(Math.abs(performance.rotationPeriod - 20) < 0.01, '20-second rotation period');
+    assert(Math.abs(performance.rotationPeriod - 40) < 0.01, '40-second rotation period');
     assert.equal(performance.drawCalls, 1);
     fs.writeFileSync('/tmp/expla-globe-performance.json', JSON.stringify(performance, null, 2));
     await page.screenshot({ path: '/tmp/expla-globe-desktop.png' });
