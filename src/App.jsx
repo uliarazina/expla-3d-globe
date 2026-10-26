@@ -3,7 +3,8 @@ import Globe from './components/Globe.jsx';
 import useReveal from './useReveal.js';
 import HeroBackground from './components/HeroBackground.jsx';
 import PartnerStrip from './components/PartnerStrip.jsx';
-import { directionDetails } from './directionDetails.js';
+import Logo from './components/Logo.jsx';
+import DirectionDialogContent from './components/DirectionDialogContent.jsx';
 
 const copy = {
   uk: {
@@ -48,9 +49,6 @@ const copy = {
   },
 };
 
-function Logo({ small = false }) {
-  return <a className={`logo${small ? ' logo--small' : ''}`} href="#about" aria-label="expla"><span>expla</span><i aria-hidden="true"/></a>;
-}
 function Arrow() { return <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 12h15m-6-6 6 6-6 6"/></svg>; }
 function ChannelLogo({ name }) {
   if (name === 'Microsoft') return <span className="channel-brand microsoft"><span className="windows" aria-hidden="true"><i/><i/><i/><i/></span>Microsoft</span>;
@@ -87,6 +85,7 @@ export default function App() {
   const [reachRef, reachRevealed] = useReveal();
   const ringGradient = `reach-ring-${useId().replaceAll(':', '')}`;
   const t = copy[language];
+  const modalOpen = Boolean(modal);
   useEffect(() => { document.documentElement.lang = language; }, [language]);
   useEffect(() => {
     if (!modal) return;
@@ -99,7 +98,7 @@ export default function App() {
       element.close(); document.body.style.overflow = previousOverflow;
       if (previouslyFocused instanceof HTMLElement && previouslyFocused.isConnected) previouslyFocused.focus({ preventScroll: true });
     };
-  }, [modal]);
+  }, [modalOpen]);
   function open(value) { setMenuOpen(false); setModal(value); }
   function goToDirections() { setModal(null); document.getElementById('directions').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' }); }
   const card = modal?.type === 'direction' ? t.cards[modal.index] : null;
@@ -145,10 +144,13 @@ export default function App() {
       </section>
     </main>
     <footer className="site-footer container"><Logo small/><div className="social-links">{['Facebook', 'Instagram', 'LinkedIn'].map(network => <button key={network} onClick={() => open({ type: 'social', network })}>{network}</button>)}</div></footer>
-    {modal && <dialog className="info-dialog" ref={dialog} aria-labelledby="dialog-title" onCancel={event => { event.preventDefault(); setModal(null); }} onClick={event => { if (event.target === event.currentTarget) { const r = event.currentTarget.getBoundingClientRect(); if (event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom) setModal(null); } }}>
-      <button className="dialog-close" type="button" aria-label={t.close} onClick={() => setModal(null)}>×</button>
-      <h2 id="dialog-title">{modalTitle}</h2>
-      {card ? <><p className="dialog-kicker">{language === 'uk' ? 'НАШІ НАПРЯМКИ' : 'OUR EXPERTISE'}</p><p className="dialog-lead">{directionDetails[language][modal.index].lead}</p>{directionDetails[language][modal.index].paragraphs.map(text => <p key={text}>{text}</p>)}<h3 className="dialog-benefits-title">{language === 'uk' ? 'Переваги' : 'Our strengths'}</h3><ul className="dialog-benefits">{directionDetails[language][modal.index].benefits.map(([title, body]) => <li key={title}><h4>{title}</h4><p>{body}</p></li>)}</ul><p className="dialog-tags">{card.tags}</p></> : modal.type === 'contact' ? <><p>{t.contactBody}</p><ContactForm t={t}/></> : modal.type === 'career' ? <><p>{t.careerBody}</p><button className="primary-button" onClick={goToDirections}>{t.careerAction}<Arrow/></button></> : modal.type === 'blog' ? <><p>{t.blogBody}</p><div className="dialog-directions">{t.cards.map((item, index) => <button key={item.title} onClick={() => open({ type: 'direction', index })}>{item.title}<Arrow/></button>)}</div></> : <p>{t.socialBody}</p>}
+    {modal && <dialog className={`info-dialog${card ? ' direction-dialog' : ''}`} ref={dialog} aria-labelledby="dialog-title" onCancel={event => { event.preventDefault(); setModal(null); }} onClick={event => { if (event.target === event.currentTarget) { const r = event.currentTarget.getBoundingClientRect(); if (event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom) setModal(null); } }}>
+      {card ? <DirectionDialogContent language={language} cards={t.cards} index={modal.index} closeLabel={t.close} onClose={() => setModal(null)} onChange={index => { setModal({ type: 'direction', index }); dialog.current.scrollTop = 0; }}/>
+        : <><button className="dialog-close" type="button" aria-label={t.close} onClick={() => setModal(null)} autoFocus>×</button>
+          <h2 id="dialog-title">{modalTitle}</h2>
+          {modal.type === 'contact' ? <><p>{t.contactBody}</p><ContactForm t={t}/></> : modal.type === 'career' ? <><p>{t.careerBody}</p><button className="primary-button" onClick={goToDirections}>{t.careerAction}<Arrow/></button></> : modal.type === 'blog' ? <><p>{t.blogBody}</p><div className="dialog-directions">{t.cards.map((item, index) => <button key={item.title} onClick={() => { open({ type: 'direction', index }); dialog.current.scrollTop = 0; }}>{item.title}<Arrow/></button>)}</div></> : <p>{t.socialBody}</p>}
+        </>}
+
     </dialog>}
   </>;
 }

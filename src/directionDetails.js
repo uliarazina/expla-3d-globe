@@ -8,9 +8,10 @@ export const directionDetails = {
         'Досліджуємо продукт партнера й потреби потенційних клієнтів, проєктуємо їхній шлях до покупки та працюємо з даними на кожному етапі. Це допомагає коригувати кампанії й підвищувати ефективність залучення.',
       ],
       benefits: [
-        ['Вимірюваний результат', 'Відстежуємо реєстрації та покупки залучених користувачів, щоб оцінювати ефективність рекламних кампаній.'],
-        ['Фокус на прибутковості', 'Оптимізуємо кампанії з урахуванням витрат на рекламу та доходу від залучених користувачів.'],
-        ['Сегментація аудиторії', 'Працюємо з різними сегментами аудиторії, щоб спрямовувати користувачів на відповідні пропозиції.'],
+        ['Ефективне залучення клієнтів', 'Фокусуємося на окупності маркетингових інвестицій — ROMI. Наші партнери оплачують отримані результати.'],
+        ['Швидкість реагування', 'Відстежуємо реєстрації та покупки залучених користувачів, щоб оцінювати ефективність рекламних кампаній.'],
+        ['Автоматизація', 'Автоматизуємо управління рекламними кампаніями, щоб швидше реагувати на зміни та ефективніше залучати користувачів.'],
+        ['Зацікавлена аудиторія', 'Знаходимо аудиторію, зацікавлену в продуктах партнерів, і приводимо користувачів, готових до покупки.'],
       ],
     },
     {
@@ -54,7 +55,7 @@ export const directionDetails = {
     {
       lead: 'Acquiring users through Meta, Instagram, Snapchat, TikTok, and X (Twitter) advertising since 2015',
       paragraphs: ['We build marketing funnels for digital companies, bringing creative thinking and analytics together to find the right audience and turn interest into action.', 'We research our partners’ products and customers’ needs, design the path to purchase, and work with data at every stage to improve acquisition.'],
-      benefits: [['Measurable results', 'We track registrations and purchases to evaluate campaign performance.'], ['Profitability first', 'We optimize campaigns around advertising costs and revenue from acquired users.'], ['Audience segmentation', 'We work with different audience segments to match people with relevant offers.']],
+      benefits: [['Efficient customer acquisition', 'We focus on return on marketing investment. Our partners pay for results.'], ['Fast response', 'We track registrations and purchases to evaluate advertising campaign performance.'], ['Automation', 'We automate campaign management to respond faster and acquire users more efficiently.'], ['Interested audiences', 'We find audiences interested in our partners’ products and bring users who are ready to buy.']],
     },
     {
       lead: 'Acquiring users for our partners through Google Ads, Microsoft Ads, and other advertising platforms',

@@ -2,7 +2,7 @@
 
 The default route renders the full Ukrainian website from the provided screenshot: header/navigation, hero, four expertise cards, an animated globe with an 80% ring and user statistic, channel strip, and footer. Mobile cards stack, the header switches to a menu, and the channels form a slow rightward marquee. Under reduced motion, the logos stop and can be browsed horizontally. UA/EN updates the page copy and document language.
 
-The source screenshot supplies the headline, statistics, descriptions, and channel names. Additional direction descriptions are editorial preview copy. The logo and channel marks are typographic/SVG approximations; replace these with original brand assets before a production launch. The screenshot-based globe remains a reconstruction; no original GLB model was provided.
+The source screenshot supplies the headline, statistics, descriptions, and channel names. Direction descriptions use the user-provided copy and mobile example. The expla logo is the original uploaded SVG; channel marks are still typographic/SVG approximations. The screenshot-based globe remains a reconstruction; no original GLB model was provided.
 
 ## Navigation and contacts
 
@@ -50,10 +50,16 @@ The nine-channel strip now includes X, SEO, and Affiliate Network from the suppl
 
 The hero uses a separate one-pass WebGL background: very slow ambient mist, with a damped pointer-driven swirl and stronger local glow on hover. It stops offscreen/in hidden tabs and becomes static under reduced motion. If WebGL is unavailable, the normal dark background remains. It does not block text selection or navigation.
 
-Each expertise card has one stretched native button covering its whole area; keyboard interaction remains native and no nested interactive controls are introduced. Hover/focus scales the card slightly and immediately highlights its details label. Popups include the lead, explanatory paragraphs, and three benefits for each direction from the Ukrainian text pasted by the user; English is a translation. `src/directionDetails.js` owns this copy.
+Each expertise card has one stretched native button covering its whole area; keyboard interaction remains native and no nested interactive controls are introduced. Hover/focus scales the card slightly and immediately highlights its details label. Popups include the lead, explanatory paragraphs, and benefits from the Ukrainian text and mobile screenshot supplied by the user; English is a translation. `src/directionDetails.js` owns this copy.
 
 `npm run test:interactions` checks the hero's actual rendered frames, hover response, full-card click, popup benefits, continuous hover autoplay, reversible wheel browsing, footer handoff, and reduced motion. Animation, site, globe, and geographic tests remain separate.
 
-## Original logo and Figma assets
+## Original logo and supplied mobile popup
 
-The latest Figma frame `6107:20102` still returns a proxy HTTP 403 in this cloud environment. The pasted file has page copy but no SVG logo, font name/file, or layer settings. The current typographic logo and font remain approximations, explicitly not original Figma assets. An exported SVG logo and the original font are still required; the blocked frame's exact visual popup specification cannot be claimed as verified.
+`public/brand/logo.svg` is the original file uploaded by the user, unchanged. It is used by `src/components/Logo.jsx` in the header, footer, and direction popup toolbar. The viewBox is 202×44; CSS scales the image without distortion. Its SHA-256 is `556bc9208eef24fee3571c7c5589bf81f6bfca6a97277eb6ddcb3f15882cfa4e`. No font rendering or reconstructed paths are used for the logo.
+
+`DirectionDialogContent.jsx` follows the attached mobile screenshot: dark toolbar with logo/close control, white direction selector, title and green tags, green article body, and white benefit cards. Social Media Advertising has the four benefits and copy shown in that screenshot. The other directions retain their corresponding supplied copy in the same layout. Mobile uses a full-viewport scrolling dialog; desktop uses a centered dialog with a two-column benefit grid. The selector changes direction in place, preserves focus, and resets the dialog scroll position. Escape/close restore the original opener's focus and page scrolling.
+
+`npm run test:design` verifies the served SVG bytes, logo dimensions, screenshot colors, dropdown switching/focus, long-popup scrolling, close behavior, and 320–1440px responsiveness. It saves `previews/expla-popup-mobile.png` and `previews/expla-popup-desktop.png`.
+
+The current Figma background (`6176:31760`), direction-popup (`6176:31485`), and mobile (`6179:34540`) links still return a proxy HTTP 403 in this cloud environment. The attached screenshot is the verified visual source for the mobile popup. Other inaccessible Figma frames, the updated top-100 background asset, and the exact website font cannot be claimed as verified. The existing interactive hero shader is retained until that background is exported or accessible.

@@ -18,7 +18,7 @@ const { launch, baseURL } = require('./browser.cjs');
     assert.equal(await card.locator('.detail-button').evaluate(e => getComputedStyle(e).color), 'rgb(32, 197, 124)', 'the card highlights its CTA on hover');
     await card.click({ position: { x: 12, y: 12 } });
     await page.getByRole('dialog').waitFor();
-    assert.equal(await page.locator('.dialog-benefits li').count(), 3);
+    assert.equal(await page.locator('.dialog-benefits li').count(), 4);
     await page.keyboard.press('Escape');
     await page.setViewportSize({ width: 1085, height: 300 });
     const strip = page.locator('.channel-strip');

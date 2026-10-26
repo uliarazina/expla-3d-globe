@@ -14,7 +14,7 @@ export default function Globe({
   oceanColor = '#212121',
   borderColor = '#02e573',
   relief = 0.012,
-  rimStrength = 0.20,
+  rimStrength = 0.065,
   maxPixelRatio = 1.5,
   textureWidth = 2048,
   className = '',

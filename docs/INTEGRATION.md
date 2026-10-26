@@ -67,7 +67,7 @@ No global Three.js scripts, external APIs, or credentials are needed. Mount once
 | `oceanColor` | `#212121` | Solid sphere color underneath polygons, including excluded areas. |
 | `borderColor` | `#02e573` | Included country outlines. |
 | `relief` | `0.012` | Raised-land height relative to sphere radius, clamped to 0–0.03. Also controls coastline bevel/shadow strength. `0` removes relief. |
-| `rimStrength` | `0.20` | Soft white edge illumination, clamped to 0–1. `0` removes the rim. |
+| `rimStrength` | `0.065` | Soft white edge illumination, clamped to 0–1. `0` removes the rim. |
 | `maxPixelRatio` | `1.5` | Upper device-pixel-ratio limit. Use `1` to reduce fill cost on constrained devices. |
 | `textureWidth` | `2048` | Atlas width, clamped to 512–4096. The height is half the width. Higher values improve close-up boundaries at extra memory/startup cost. |
 | `className`, `style` | none | Apply host layout styles to the wrapper. |
@@ -93,3 +93,5 @@ The current appearance is reconstructed from the two PNG images supplied in chat
 Land `#03FA7F` and ocean `#212121` are the exact base-color values supplied by the user; border `#02e573` is a subtle derived outline. These values are not retrieved Figma design tokens. Lighting changes displayed pixel colors. Exact design tokens can replace these props later. Real GeoJSON replaces the reference's stylized geography, including the explicit RUS/BLR exclusions; those differences are intentional.
 
 Ukraine now includes Crimea and Sevastopol; see [geographic provenance](GEOGRAPHY.md). The stape.io reference could not be accessed (HTTP 403), so its rotation period has not been measured. The current default remains 20 seconds per turn and can be changed via `rotationPeriod`.
+
+Globe lighting was softened at the user’s request: the default rim is 0.065, the ocean specular coefficient is 0.025, the land specular coefficient is 0.005, and the coast highlight coefficient is 0.025. Base land/ocean colors and geography are unchanged.
