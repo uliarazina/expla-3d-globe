@@ -67,7 +67,7 @@ No global Three.js scripts, external APIs, or credentials are needed. Mount once
 | `oceanColor` | `#212121` | Solid sphere color underneath polygons, including excluded areas. |
 | `borderColor` | `#02e573` | Included country outlines. |
 | `relief` | `0.014` | Shader coastline bevel/shadow strength, clamped to 0–0.03. `0` removes the relief illusion. Vertices stay on the sphere to prevent spikes. |
-| `rimStrength` | `0.075` | Soft white edge illumination, clamped to 0–1. `0` removes the rim. |
+| `rimStrength` | `0` | Soft white edge illumination, clamped to 0–1. `0` removes the rim. |
 | `maxPixelRatio` | `2` | Upper device-pixel-ratio limit. Use `1` to reduce fill cost on constrained devices. |
 | `textureWidth` | `4096` | Atlas width, clamped to 512–4096. The height is half the width. Higher values improve close-up boundaries at extra memory/startup cost. |
 | `className`, `style` | none | Apply host layout styles to the wrapper. |
@@ -94,6 +94,6 @@ Land `#03FA7F` and ocean `#212121` are the exact base-color values supplied by t
 
 Ukraine now includes Crimea and Sevastopol; see [geographic provenance](GEOGRAPHY.md). The stape.io reference could not be accessed (HTTP 403), so its rotation period has not been measured. The current default is 60 seconds per turn and can be changed via `rotationPeriod`.
 
-Globe lighting follows the latest glossy reference: the default rim is 0.075, the ocean specular coefficient is 0.20, the land specular coefficient is 0.055, and the coast highlight coefficient is 0.045. The tighter studio reflection (shininess exponent 42) adds a lacquered finish without bloom or an external glow layer. Base land/ocean colors and geography are unchanged.
+Globe lighting follows the latest glossy reference: the default rim is 0 (no edge glow), the ocean specular coefficient is 0.24, the land specular coefficient is 0.11, and the coast highlight coefficient is 0.045. The tighter studio reflection (shininess exponent 42) adds a lacquered finish without bloom or an external glow layer. Base land/ocean colors and geography are unchanged.
 
 Quality defaults are now 4K atlases and up to 2× device pixel density. On constrained devices or when many globes are embedded, use `textureWidth={2048}` and `maxPixelRatio={1}` to reduce texture memory/fill cost. `npm run test:quality` verifies the actual Retina drawing buffer and texture dimensions, and measures the rendered circular alpha contour to catch spiky geometry regressions. It also captures the high-resolution transparent PNG.
