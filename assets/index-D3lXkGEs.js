@@ -3912,7 +3912,9 @@ void main() {
             float leftGlow=exp(-dot((flowUv-vec2(.08,.12))/vec2(.29,.40),
               (flowUv-vec2(.08,.12))/vec2(.29,.40)));
             float field=.48*rightWave+.33*lowerWave+.25*upperGlow+.16*leftGlow;
-            float readability=1.0-.78*exp(-pow((uvPosition.x-.48)/.25,2.0));
+            // Keep the text area nearly black throughout cursor distortion.
+            float edgeMask=smoothstep(.16,.48,abs(uvPosition.x-.5));
+            float readability=mix(.018,1.0,edgeMask);
             float hover=1.0+activity*1.1*exp(-radius*2.0);
             float intensity=clamp(field*readability*hover,0.0,.92);
             gl_FragColor=vec4(mix(vec3(.0004,.0008,.0006),brandColor,intensity),1.0);
