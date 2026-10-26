@@ -40,12 +40,20 @@ https://uliarazina.github.io/expla-3d-globe/
 
 A pushed branch does not prove Pages is enabled or the URL is live. This cloud environment returned HTTP 403 for GitHub's API and public Pages domain, so activation and public availability cannot be verified here. The production build is separately tested under the `/expla-3d-globe/` prefix before publication.
 
-## Motion refinements
+## Current motion and interactions
 
-The reach section is observed once per page visit. On entry, the ring fills from 0% to 80% over 2.8 seconds, while eight of ten cubes fill from bottom to top with staggered delays; the final two remain gray. Re-entering the viewport does not restart the sequence. Reduced-motion users see the final 80%/8-of-10 state immediately.
+The globe ring is a static 80% illustration. Only the eight-of-ten cubes animate on the reach section's first viewport entry, with staggered bottom-to-top fills. Reduced-motion users see the final cube state immediately.
 
-The logo strip consists of two identical groups moving right over 42 seconds, so the loop boundary has no content jump. Hovering/focusing pauses it. Reduced motion removes the animation and duplicate visual group. Cards lift 4px and scale 1.012 on hover/focus with a soft shadow; reduced motion removes the transform.
+Holding the primary pointer pauses globe auto-rotation. Horizontal manual turning still works; release, cancellation, or loss of window focus resumes rotation with a fresh timestamp baseline, avoiding catch-up jumps. Vertical gestures do not tilt the globe.
 
-`npm run test:animations` checks the stagger, final ring value, marquee direction/loop groups, hover, and reduced motion. `npm run test:geography` checks Ukraine's inclusion of Crimea and regenerates the country-outline preview. The globe's horizontal-only input is tested by `npm run test:smoke`.
+The nine-channel strip now includes X, SEO, and Affiliate Network from the supplied design text. It moves right continuously, including on hover. A non-passive wheel handler takes over for forward/backward browsing. At the first or last item it leaves further wheel events to the page, allowing scroll to the footer without a trap. Arrow keys and horizontal touch dragging also browse the strip. Automatic motion is disabled under reduced motion.
 
-The new Figma links and stape.io could not be opened from this environment (HTTP 403). The pasted text contains page copy but no original logo, font name/file, or design tokens. The existing typographic logo and fallback font are retained until the actual SVG logo and font are supplied; they are not claimed to match Figma.
+The hero uses a separate one-pass WebGL background: very slow ambient mist, with a damped pointer-driven swirl and stronger local glow on hover. It stops offscreen/in hidden tabs and becomes static under reduced motion. If WebGL is unavailable, the normal dark background remains. It does not block text selection or navigation.
+
+Each expertise card has one stretched native button covering its whole area; keyboard interaction remains native and no nested interactive controls are introduced. Hover/focus scales the card slightly and immediately highlights its details label. Popups include the lead, explanatory paragraphs, and three benefits for each direction from the Ukrainian text pasted by the user; English is a translation. `src/directionDetails.js` owns this copy.
+
+`npm run test:interactions` checks the hero's actual rendered frames, hover response, full-card click, popup benefits, continuous hover autoplay, reversible wheel browsing, footer handoff, and reduced motion. Animation, site, globe, and geographic tests remain separate.
+
+## Original logo and Figma assets
+
+The latest Figma frame `6107:20102` still returns a proxy HTTP 403 in this cloud environment. The pasted file has page copy but no SVG logo, font name/file, or layer settings. The current typographic logo and font remain approximations, explicitly not original Figma assets. An exported SVG logo and the original font are still required; the blocked frame's exact visual popup specification cannot be claimed as verified.

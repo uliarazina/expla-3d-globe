@@ -19,6 +19,7 @@ npm run dev -- --port 5173
 npm run build
 npm run test:site
 npm run test:animations
+npm run test:interactions
 npm run test:geography
 npm run test:smoke
 ```

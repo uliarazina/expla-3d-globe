@@ -1,6 +1,9 @@
 import React, { useEffect, useId, useRef, useState } from 'react';
 import Globe from './components/Globe.jsx';
 import useReveal from './useReveal.js';
+import HeroBackground from './components/HeroBackground.jsx';
+import PartnerStrip from './components/PartnerStrip.jsx';
+import { directionDetails } from './directionDetails.js';
 
 const copy = {
   uk: {
@@ -8,10 +11,10 @@ const copy = {
     title: 'expla топ-100 партнерів', subtitle: 'Meta Ads & Google Ads у Європі',
     directions: 'Наші напрямки', more: 'ДЕТАЛЬНІШЕ',
     cards: [
-      { title: 'Social Media Advertising', description: 'Залучаємо користувачів через рекламу в соціальних мережах', tags: 'META ADS · TIKTOK · SNAPCHAT · X', detail: 'Поєднуємо стратегію, креативи та аналітику, щоб знаходити вашу аудиторію в соціальних мережах. Тестуємо ідеї, оптимізуємо кампанії та масштабуємо те, що працює.' },
-      { title: 'PPC Team', description: 'Перетворюємо рекламний клік на реєстрацію чи покупку', tags: 'GOOGLE ADS · MICROSOFT ADS · NATIVE ADS', detail: 'Працюємо з пошуковою та нативною рекламою на всіх етапах шляху користувача. Аналізуємо результати та оптимізуємо кампанії відповідно до бізнес-цілей.' },
-      { title: 'SEO', description: 'Розвиваємо власні сайти та залучаємо користувачів із пошуку Google', tags: 'ОРГАНІЧНИЙ ПОШУК · КОНТЕНТ · АНАЛІТИКА', detail: 'Досліджуємо пошуковий попит, створюємо корисний контент і працюємо з технічною оптимізацією. Допомагаємо людям знаходити відповіді, а проєктам — свою аудиторію.' },
-      { title: 'Affiliate Network', description: 'Поєднуємо рекламодавців і афіліатів у партнерську мережу', tags: 'CPAMATICA · 1 000+ ПАРТНЕРІВ', detail: 'Об’єднуємо рекламодавців і партнерів навколо спільного результату. Створюємо можливості для співпраці та розвитку performance-маркетингу.' },
+      { title: 'Social Media Advertising', description: 'Залучаємо користувачів через рекламу в соціальних мережах', tags: 'META ADS · TIKTOK · SNAPCHAT · X' },
+      { title: 'PPC Team', description: 'Перетворюємо рекламний клік на реєстрацію чи покупку', tags: 'GOOGLE ADS · MICROSOFT ADS · NATIVE ADS' },
+      { title: 'SEO', description: 'Розвиваємо власні сайти та залучаємо користувачів із пошуку Google', tags: 'ОРГАНІЧНИЙ ПОШУК · КОНТЕНТ · АНАЛІТИКА' },
+      { title: 'Affiliate Network', description: 'Поєднуємо рекламодавців і афіліатів у партнерську мережу', tags: 'CPAMATICA · 1 000+ ПАРТНЕРІВ' },
     ],
     seen: 'нашу рекламу бачать', online: 'онлайн-користувачів у світі', users: '8 з 10 користувачів',
     zone: 'НАША ЗОНА РОБОТИ', channelsStart: 'Канали, що перетворюють', channelsEnd: 'увагу на', result: 'результат',
@@ -29,10 +32,10 @@ const copy = {
     title: 'expla is a top-100 partner', subtitle: 'for Meta Ads & Google Ads in Europe',
     directions: 'Our expertise', more: 'LEARN MORE',
     cards: [
-      { title: 'Social Media Advertising', description: 'Connecting people with brands through social media advertising', tags: 'META ADS · TIKTOK · SNAPCHAT · X', detail: 'We bring strategy, creative work, and analytics together to find your audience on social media. We test ideas, optimize campaigns, and scale what works.' },
-      { title: 'PPC Team', description: 'Turning an ad click into a registration or a purchase', tags: 'GOOGLE ADS · MICROSOFT ADS · NATIVE ADS', detail: 'We work with search and native advertising throughout the customer journey, measuring results and optimizing campaigns around business goals.' },
-      { title: 'SEO', description: 'Growing our own websites and attracting users from Google search', tags: 'ORGANIC SEARCH · CONTENT · ANALYTICS', detail: 'We research search demand, create useful content, and improve technical performance. Helping people find answers and projects find their audience.' },
-      { title: 'Affiliate Network', description: 'Bringing advertisers and affiliates together in a partner network', tags: 'CPAMATICA · 1,000+ PARTNERS', detail: 'We connect advertisers and partners around shared outcomes, creating opportunities for collaboration and growth in performance marketing.' },
+      { title: 'Social Media Advertising', description: 'Connecting people with brands through social media advertising', tags: 'META ADS · TIKTOK · SNAPCHAT · X' },
+      { title: 'PPC Team', description: 'Turning an ad click into a registration or a purchase', tags: 'GOOGLE ADS · MICROSOFT ADS · NATIVE ADS' },
+      { title: 'SEO', description: 'Growing our own websites and attracting users from Google search', tags: 'ORGANIC SEARCH · CONTENT · ANALYTICS' },
+      { title: 'Affiliate Network', description: 'Bringing advertisers and affiliates together in a partner network', tags: 'CPAMATICA · 1,000+ PARTNERS' },
     ],
     seen: 'our advertising reaches', online: 'of online users worldwide', users: '8 out of 10 users',
     zone: 'WHERE WE WORK', channelsStart: 'Channels that turn', channelsEnd: 'attention into', result: 'results',
@@ -118,11 +121,11 @@ export default function App() {
       </div>
     </header>
     <main id="main">
-      <section className="hero container" id="about"><h1>{t.title}</h1><p>{t.subtitle}</p></section>
+      <section className="hero container" id="about"><HeroBackground/><h1>{t.title}</h1><p>{t.subtitle}</p></section>
       <section className="directions" id="directions" aria-labelledby="directions-title">
         <div className="container"><h2 id="directions-title">{t.directions}</h2>
           <div className="direction-grid">{t.cards.map((item, index) => <article className="direction-card" key={item.title}>
-            <h3>{item.title}</h3><p>{item.description}</p><div className="card-bottom"><p className="card-tags">{item.tags}</p><button className="detail-button" onClick={() => open({ type: 'direction', index })} aria-label={`${t.more}: ${item.title}`}>{t.more}<Arrow/></button></div>
+            <h3>{item.title}</h3><p>{item.description}</p><div className="card-bottom"><p className="card-tags">{item.tags}</p><button className="detail-button" aria-haspopup="dialog" onClick={() => open({ type: 'direction', index })} aria-label={`${t.more}: ${item.title}`}>{t.more}<Arrow/></button></div>
           </article>)}</div>
         </div>
       </section>
@@ -137,18 +140,15 @@ export default function App() {
         </div>
       </section>
       <section className="channels" aria-labelledby="channels-title"><div className="container channels-heading"><p className="section-eyebrow"><i aria-hidden="true"/>{t.zone}</p><h2 id="channels-title">{t.channelsStart}<br/>{t.channelsEnd} <span>{t.result}</span></h2></div>
-        <div className="channel-strip" tabIndex={0} role="region" aria-label={language === 'uk' ? 'Рекламні платформи' : 'Advertising platforms'}>
-          <div className="channel-track">{[0, 1].map(group => <div className={`channel-group${group ? ' channel-group--duplicate' : ''}`} key={group} aria-hidden={group ? true : undefined}>
-            {['Google', 'Meta', 'Microsoft', 'Native Ads', 'TikTok', 'Snapchat'].map((name, index) => <div className="channel" key={name}><span className="channel-number">0{index + 1}</span><ChannelLogo name={name}/></div>)}
-          </div>)}</div>
-        </div>
+        <PartnerStrip items={['Google', 'Meta', 'Microsoft', 'Native Ads', 'TikTok', 'Snapchat', 'X', 'SEO', 'Affiliate Network']} renderItem={name => <ChannelLogo name={name}/>} label={language === 'uk' ? 'Рекламні платформи' : 'Advertising platforms'}/>
+
       </section>
     </main>
     <footer className="site-footer container"><Logo small/><div className="social-links">{['Facebook', 'Instagram', 'LinkedIn'].map(network => <button key={network} onClick={() => open({ type: 'social', network })}>{network}</button>)}</div></footer>
     {modal && <dialog className="info-dialog" ref={dialog} aria-labelledby="dialog-title" onCancel={event => { event.preventDefault(); setModal(null); }} onClick={event => { if (event.target === event.currentTarget) { const r = event.currentTarget.getBoundingClientRect(); if (event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom) setModal(null); } }}>
       <button className="dialog-close" type="button" aria-label={t.close} onClick={() => setModal(null)}>×</button>
       <h2 id="dialog-title">{modalTitle}</h2>
-      {card ? <><p>{card.detail}</p><p className="dialog-tags">{card.tags}</p></> : modal.type === 'contact' ? <><p>{t.contactBody}</p><ContactForm t={t}/></> : modal.type === 'career' ? <><p>{t.careerBody}</p><button className="primary-button" onClick={goToDirections}>{t.careerAction}<Arrow/></button></> : modal.type === 'blog' ? <><p>{t.blogBody}</p><div className="dialog-directions">{t.cards.map((item, index) => <button key={item.title} onClick={() => open({ type: 'direction', index })}>{item.title}<Arrow/></button>)}</div></> : <p>{t.socialBody}</p>}
+      {card ? <><p className="dialog-kicker">{language === 'uk' ? 'НАШІ НАПРЯМКИ' : 'OUR EXPERTISE'}</p><p className="dialog-lead">{directionDetails[language][modal.index].lead}</p>{directionDetails[language][modal.index].paragraphs.map(text => <p key={text}>{text}</p>)}<h3 className="dialog-benefits-title">{language === 'uk' ? 'Переваги' : 'Our strengths'}</h3><ul className="dialog-benefits">{directionDetails[language][modal.index].benefits.map(([title, body]) => <li key={title}><h4>{title}</h4><p>{body}</p></li>)}</ul><p className="dialog-tags">{card.tags}</p></> : modal.type === 'contact' ? <><p>{t.contactBody}</p><ContactForm t={t}/></> : modal.type === 'career' ? <><p>{t.careerBody}</p><button className="primary-button" onClick={goToDirections}>{t.careerAction}<Arrow/></button></> : modal.type === 'blog' ? <><p>{t.blogBody}</p><div className="dialog-directions">{t.cards.map((item, index) => <button key={item.title} onClick={() => open({ type: 'direction', index })}>{item.title}<Arrow/></button>)}</div></> : <p>{t.socialBody}</p>}
     </dialog>}
   </>;
 }

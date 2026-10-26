@@ -39,7 +39,7 @@ export default function Globe({
     let renderer, resizeObserver, intersectionObserver;
     let removeInteraction = () => {};
     let disposed = false, frame = null, previousTime = null, inView = true;
-    let elapsed = 0;
+    let elapsed = 0, held = false;
     const schedule = () => {
       if (!disposed && frame === null) frame = requestAnimationFrame(render);
     };
@@ -55,7 +55,7 @@ export default function Globe({
       const delta = previousTime === null ? 0 : (timestamp - previousTime) / 1000;
       previousTime = timestamp;
       const { paused, rotationPeriod, onFrame } = live.current;
-      const spinning = !paused && !motion.matches && Number.isFinite(rotationPeriod) && rotationPeriod > 0;
+      const spinning = !paused && !held && !motion.matches && Number.isFinite(rotationPeriod) && rotationPeriod > 0;
       // Integrate actual rAF time: frame drops never slow the revolution period.
       // Keep the angle unwrapped, avoiding a discontinuity at the loop boundary.
       if (spinning) globe.rotation.y += (Math.PI * 2 / rotationPeriod) * delta;
@@ -169,7 +169,7 @@ export default function Globe({
           let pointerId = null, lastX = 0;
           const down = event => {
             if (!event.isPrimary || event.button !== 0) return;
-            pointerId = event.pointerId; lastX = event.clientX;
+            pointerId = event.pointerId; lastX = event.clientX; held = true; resetTime();
             canvas.setPointerCapture(pointerId);
           };
           const move = event => {
@@ -179,7 +179,10 @@ export default function Globe({
             lastX = event.clientX;
             schedule();
           };
-          const end = () => { pointerId = null; };
+          const end = event => {
+            if (event?.pointerId !== undefined && event.pointerId !== pointerId) return;
+            pointerId = null; held = false; resetTime();
+          };
           const key = event => {
             if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
             event.preventDefault();
@@ -189,7 +192,9 @@ export default function Globe({
           const listeners = { pointerdown: down, pointermove: move, pointerup: end,
             pointercancel: end, lostpointercapture: end, keydown: key };
           for (const [type, listener] of Object.entries(listeners)) canvas.addEventListener(type, listener);
+          window.addEventListener('blur', end);
           removeInteraction = () => {
+            window.removeEventListener('blur', end);
             for (const [type, listener] of Object.entries(listeners)) canvas.removeEventListener(type, listener);
           };
         }

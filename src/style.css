@@ -9,18 +9,28 @@
 @media(max-width:520px){.reach{grid-template-columns:minmax(0,1fr)}}
 /* Scroll-triggered statistics, once per visit. */
 .globe-ring{display:block;background:none;mask:none;-webkit-mask:none;overflow:visible}
-.globe-ring circle{fill:none;stroke-width:1.8}.ring-track{stroke:#29292d}.ring-progress{stroke-dasharray:100;stroke-dashoffset:100;transition:stroke-dashoffset 2.8s cubic-bezier(.22,.7,.25,1)}
+.globe-ring circle{fill:none;stroke-width:1.8}.ring-track{stroke:#29292d}.ring-progress{stroke-dasharray:100;stroke-dashoffset:20;transition:none}
 .reach.is-revealed .ring-progress{stroke-dashoffset:20}
 .meter-blocks i,.meter-blocks i.is-filled{position:relative;overflow:hidden;background:#3a3a3f}
 .meter-blocks i.is-filled::before{content:'';position:absolute;inset:0;background:var(--green);transform:scaleY(0);transform-origin:bottom;transition:transform .55s cubic-bezier(.22,.7,.25,1);transition-delay:var(--cube-delay)}
 .reach.is-revealed .meter-blocks i.is-filled::before{transform:scaleY(1)}
 /* Two identical groups make the rightward loop continuous at its boundary. */
 .channel-strip{display:block;overflow-x:auto;scrollbar-width:none}.channel-strip::-webkit-scrollbar{display:none}
-.channel-track{display:flex;width:max(200%,1560px);animation:channels-right 42s linear infinite;will-change:transform}
+.channel-track{display:flex;will-change:transform}
 .channel-group{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));width:50%;flex-shrink:0}
 .channel-group .channel{border-bottom:0;border-right:1px solid #77777b}
-.channel-strip:hover .channel-track,.channel-strip:focus-within .channel-track{animation-play-state:paused}
-@keyframes channels-right{from{transform:translateX(-50%)}to{transform:translateX(0)}}
+
+
 .direction-card{transition:transform .28s ease,box-shadow .28s ease}
 @media(hover:hover) and (pointer:fine){.direction-card:hover,.direction-card:focus-within{transform:translateY(-4px) scale(1.012);box-shadow:0 12px 28px #0003}}
-@media(prefers-reduced-motion:reduce){.ring-progress{transition:none;stroke-dashoffset:20}.meter-blocks i.is-filled::before{transition:none;transform:scaleY(1)}.channel-track{animation:none;transform:none;width:max(100%,780px)}.channel-group{width:100%}.channel-group--duplicate{display:none}.direction-card:hover,.direction-card:focus-within{transform:none;box-shadow:none}}
+@media(prefers-reduced-motion:reduce){.ring-progress{transition:none;stroke-dashoffset:20}.meter-blocks i.is-filled::before{transition:none;transform:scaleY(1)}.direction-card:hover,.direction-card:focus-within{transform:none;box-shadow:none}}
+/* The entire expertise card is a single accessible button hit target. */
+.direction-card{position:relative}.detail-button::after{content:'';position:absolute;inset:0;z-index:1}
+.direction-card:hover .detail-button,.direction-card:focus-within .detail-button{color:var(--green);border-top-color:var(--green)}
+.direction-card:hover .detail-button svg{transform:translateX(4px)}
+.direction-card:focus-within{outline:2px solid #fff;outline-offset:-2px}
+.hero{position:relative;isolation:isolate}.hero-background{position:absolute;inset:-24px 0 -20px;z-index:-1;pointer-events:none;overflow:hidden}.hero-background canvas{display:block;width:100%;height:100%;max-width:100%}
+.channel-strip{overflow:hidden;touch-action:pan-y}.channel-track{animation:none!important;width:max(300%,1980px);will-change:transform}.channel-group{width:50%;grid-template-columns:repeat(9,minmax(0,1fr))}
+.channel-brand{white-space:normal}
+.dialog-kicker{color:var(--green)!important;font-size:11px!important;letter-spacing:1.5px}.dialog-lead{font-size:20px!important;color:white!important;line-height:1.4!important}.dialog-benefits-title{font-size:22px;margin-top:30px}.dialog-benefits{list-style:none;margin:16px 0 0;padding:0;display:grid;gap:18px}.dialog-benefits li{padding-top:18px;border-top:1px solid #34343a}.dialog-benefits h4{margin:0;color:var(--green);font-size:16px}.dialog-benefits p{margin-top:7px;font-size:14px}
+@media(prefers-reduced-motion:reduce){.channel-track{animation:none!important}.hero-background{opacity:.65}}

@@ -1,0 +1,48 @@
+const assert = require('node:assert/strict');
+const { launch, baseURL } = require('./browser.cjs');
+(async () => {
+  const browser = await launch();
+  try {
+    const page = await browser.newPage({ viewport: { width: 1085, height: 900 }, reducedMotion: 'no-preference' });
+    const errors = []; page.on('pageerror', e => errors.push(e.message));
+    page.on('console', message => { if (message.type() === 'error' && /THREE.WebGLProgram|shader error|VALIDATE_STATUS/i.test(message.text())) errors.push(message.text()); });
+    await page.goto(baseURL);
+    const background = page.locator('.hero-background canvas'); await background.waitFor();
+    await page.waitForTimeout(500);
+    const ambient = await background.screenshot(); await page.waitForTimeout(800);
+    assert(!ambient.equals(await background.screenshot()), 'hero shader drifts autonomously');
+    await page.locator('.hero').hover({ position: { x: 200, y: 60 } }); await page.waitForTimeout(600);
+    assert(!ambient.equals(await background.screenshot()), 'hero shader responds to pointer movement');
+    const card = page.locator('.direction-card').first();
+    await card.hover(); await page.waitForTimeout(350);
+    assert.equal(await card.locator('.detail-button').evaluate(e => getComputedStyle(e).color), 'rgb(32, 197, 124)', 'the card highlights its CTA on hover');
+    await card.click({ position: { x: 12, y: 12 } });
+    await page.getByRole('dialog').waitFor();
+    assert.equal(await page.locator('.dialog-benefits li').count(), 3);
+    await page.keyboard.press('Escape');
+    await page.setViewportSize({ width: 1085, height: 300 });
+    const strip = page.locator('.channel-strip');
+    await strip.evaluate(e => e.scrollIntoView({ block: 'center', behavior: 'instant' }));
+    await strip.hover();
+    const track = page.locator('.channel-track');
+    const first = await track.evaluate(e => new DOMMatrixReadOnly(getComputedStyle(e).transform).m41);
+    await page.waitForTimeout(250);
+    assert((await track.evaluate(e => new DOMMatrixReadOnly(getComputedStyle(e).transform).m41)) > first, 'logos keep moving while hovered');
+    const initialY = await page.evaluate(() => scrollY);
+    await page.mouse.wheel(0, 180); await page.waitForTimeout(120);
+    assert.equal(await strip.getAttribute('data-wheel-position'), '180');
+    assert.equal(await page.evaluate(() => scrollY), initialY, 'wheel scroll is consumed while browsing logos');
+    await page.mouse.wheel(0, -90); await page.waitForTimeout(120);
+    assert.equal(await strip.getAttribute('data-wheel-position'), '90', 'reverse wheel moves back');
+    await page.mouse.wheel(0, 10000); await page.waitForTimeout(120);
+    assert.equal(await strip.getAttribute('data-wheel-position'), await strip.getAttribute('data-wheel-maximum'));
+    await page.mouse.wheel(0, 250); await page.waitForTimeout(250);
+    assert((await page.evaluate(() => scrollY)) > initialY, 'at the last logo wheel scrolling reaches the footer');
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.evaluate(() => scrollTo({ top: 0, behavior: 'instant' })); await page.waitForTimeout(400);
+    const staticShader = await background.screenshot(); await page.waitForTimeout(400);
+    assert(staticShader.equals(await background.screenshot()), 'reduced motion stops the hero shader');
+    assert.deepEqual(errors, []);
+    console.log('PASS: ambient/reactive hero shader, full-card click and CTA highlight, supplied popup details, hover autoplay, bidirectional wheel and footer handoff, reduced motion.');
+  } finally { await browser.close(); }
+})().catch(e => { console.error(e); process.exitCode = 1; });

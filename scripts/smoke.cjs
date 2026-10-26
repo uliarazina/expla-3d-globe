@@ -42,6 +42,18 @@ const { launch, baseURL } = require('./browser.cjs');
 
     await page.goto(`${baseURL}/scripts/fixtures/globe.html`);
     await page.waitForSelector('canvas');
+    await page.waitForFunction(() => window.__samples.length > 1);
+    const holdCanvas = page.locator('canvas'); const holdBox = await holdCanvas.boundingBox();
+    await page.mouse.move(holdBox.x + holdBox.width / 2, holdBox.y + holdBox.height / 2);
+    await page.mouse.down(); await page.waitForTimeout(100);
+    const heldAngle = await page.evaluate(() => window.__samples.at(-1).rotation);
+    await page.waitForTimeout(350);
+    assert.equal(await page.evaluate(() => window.__samples.at(-1).rotation), heldAngle, 'holding the mouse pauses auto rotation');
+    await page.mouse.up(); await page.waitForTimeout(350);
+    const releasedAngle = await page.evaluate(() => window.__samples.at(-1).rotation);
+    assert(releasedAngle > heldAngle && releasedAngle - heldAngle < .3, 'release resumes without a catch-up jump');
+
+    await page.waitForSelector('canvas');
     await page.evaluate(() => window.renderGlobe({ paused: true }));
     await page.waitForTimeout(150);
     const canvas = page.locator('canvas');
