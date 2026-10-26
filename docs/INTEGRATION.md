@@ -30,7 +30,7 @@ export default function CompanySection() {
 }
 ```
 
-The parent supplies the dimensions and background. The component's canvas is transparent outside the sphere, while the sphere itself is solid. It can sit over a company section's existing color, image, or gradient. The component imports its own narrowly scoped stylesheet; do not copy `src/style.css` or `src/main.jsx`. Those are preview-only files. The production `dist/` folder is a demo build, not an npm component package.
+The parent supplies the dimensions and background. The component's canvas is transparent outside the sphere, while the sphere itself is solid. It can sit over a company section's existing color, image, or gradient. The component imports its own narrowly scoped stylesheet; do not copy `src/style.css` or `src/main.jsx`. Those are the full website layer; the isolated preview is available at `?view=globe`. The production `dist/` folder is a demo build, not an npm component package.
 
 For a site hosted below a URL prefix, supply the correct asset path, e.g. `dataUrl="/company/assets/countries.geojson"`. Vite consumers can use ``dataUrl={`${import.meta.env.BASE_URL}data/countries.geojson`}``. A cross-origin data URL must permit CORS. A missing asset or unavailable WebGL produces an accessible fallback message. The component performs no browser operations until it mounts; frameworks such as Next.js should import it through a client component (`'use client'`).
 

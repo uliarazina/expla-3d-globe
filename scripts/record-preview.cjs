@@ -22,7 +22,7 @@ const { spawnSync } = require('node:child_process');
         for (const callback of callbacks) callback(timestamp);
       };
     });
-    await page.goto(baseURL);
+    await page.goto(`${baseURL}/?view=globe`);
     await page.waitForSelector('canvas');
     await page.waitForTimeout(500); // Let the resize and intersection observers settle first.
     const hashes = new Set();

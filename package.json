@@ -8,7 +8,9 @@
     "build": "vite build",
     "preview": "vite preview --host 0.0.0.0",
     "test:smoke": "node scripts/smoke.cjs",
-    "record:preview": "node scripts/record-preview.cjs"
+    "record:preview": "node scripts/record-preview.cjs",
+    "test:site": "node scripts/test-site.cjs",
+    "deploy:pages": "npm run build && node scripts/publish-pages.cjs"
   },
   "dependencies": {
     "d3-geo": "^3.1.1",

@@ -1,15 +1,14 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
+import App from './App.jsx';
 import Globe from './components/Globe.jsx';
 import './style.css';
 
-// Preview-only instrumentation; no globals or demo controls inside the component.
 const onFrame = sample => {
   window.__globeFrame = sample;
   window.__globeSamples?.push(sample);
 };
-createRoot(document.getElementById('root')).render(
-  <main className="preview" aria-label="Globe integration preview">
-    <Globe onFrame={onFrame}/>
-  </main>,
-);
+const globeOnly = new URLSearchParams(window.location.search).get('view') === 'globe';
+createRoot(document.getElementById('root')).render(globeOnly
+  ? <main className="standalone-preview" aria-label="Globe integration preview"><Globe dataUrl={`${import.meta.env.BASE_URL}data/countries.geojson`} onFrame={onFrame}/></main>
+  : <App/>);

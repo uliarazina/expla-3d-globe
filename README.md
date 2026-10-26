@@ -1,7 +1,8 @@
-# expla globe
+# expla website & globe
 
-A standalone React + Three.js globe with a transparent background, bright green raised country polygons and a softly lit black sphere, a continuous 20-second rotation, drag/touch/keyboard interaction, and reduced-motion support. The page in `src/main.jsx` is only a minimal preview. No landing page, labels, buttons, or decorative UI are included.
+A standalone React + Three.js globe with a transparent background, bright green raised country polygons and a softly lit black sphere, a continuous 20-second rotation, drag/touch/keyboard interaction, and reduced-motion support. The default page now reproduces the full website screenshot. Use `?view=globe` for the isolated component preview. The reusable globe itself still contains no labels or website UI.
 
+- **Website and publication:** [Full-site guide](docs/WEBSITE.md)
 - **Integrate:** [Developer handoff](docs/INTEGRATION.md)
 - **Component:** [Globe.jsx](src/components/Globe.jsx), [Globe.css](src/components/Globe.css), and [globeMaterial.js](src/components/globeMaterial.js)
 - **Video:** [10-second MP4, 30 FPS](previews/expla-globe-30fps.mp4)
@@ -16,6 +17,7 @@ npm ci --cache /tmp/expla-npm-cache
 npm run dev -- --port 5173
 # In a second terminal:
 npm run build
+npm run test:site
 npm run test:smoke
 ```
 
@@ -29,4 +31,4 @@ The browser test uses `/usr/bin/chromium` if available. Otherwise run `npx playw
 
 Features with ISO alpha-3 codes `RUS` and `BLR` are absent from the shipped dataset and filtered again when rendering. They have no country fill or outlines. The sphere beneath remains uninterrupted. Included neighbors retain their own complete boundaries. No country labels are drawn. Ring winding is normalized for d3-geo before texture generation. All geography is served locally, without API keys or third-party runtime services.
 
-The appearance follows the globe PNGs supplied in chat on 2026-10-26. Colors are PNG-based approximations rather than exported Figma tokens. The surrounding ring, website content, and statistics are not part of this component.
+The appearance follows the globe PNGs supplied in chat on 2026-10-26. Colors are PNG-based approximations rather than exported Figma tokens. The surrounding ring, website content, and statistics live in `src/App.jsx`, separate from the globe component.

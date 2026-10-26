@@ -11,7 +11,7 @@ const { launch, baseURL } = require('./browser.cjs');
     page.on('console', message => {
       if (message.type() === 'error' && /THREE.WebGLProgram|VALIDATE_STATUS|shader error/i.test(message.text())) errors.push(message.text());
     });
-    await page.goto(baseURL);
+    await page.goto(`${baseURL}/?view=globe`);
     await page.waitForSelector('canvas');
     await page.waitForTimeout(1200);
     // Measure actual rendered frames, without screenshots or video capture in flight.
