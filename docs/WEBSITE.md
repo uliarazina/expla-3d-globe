@@ -42,13 +42,13 @@ A pushed branch does not prove Pages is enabled or the URL is live. This cloud e
 
 ## Current motion and interactions
 
-The globe ring is a static 80% illustration. Only the eight-of-ten cubes animate on the reach section's first viewport entry, with staggered bottom-to-top fills. Reduced-motion users see the final cube state immediately.
+The globe ring is a static, closed green outline with a muted inner rim, following the supplied screenshot; it is decorative rather than an 80% progress arc. Only the eight-of-ten cubes animate on the reach section's first viewport entry, with staggered bottom-to-top fills. Reduced-motion users see the final cube state immediately.
 
 Holding the primary pointer pauses globe auto-rotation. Horizontal manual turning still works; release, cancellation, or loss of window focus resumes rotation with a fresh timestamp baseline, avoiding catch-up jumps. Vertical gestures do not tilt the globe.
 
 The nine-channel strip now includes X, SEO, and Affiliate Network from the supplied design text. It moves right continuously, including on hover. A non-passive wheel handler takes over for forward/backward browsing. At the first or last item it leaves further wheel events to the page, allowing scroll to the footer without a trap. Arrow keys and horizontal touch dragging also browse the strip. Automatic motion is disabled under reduced motion.
 
-The hero uses a separate one-pass WebGL background: very slow ambient mist, with a damped pointer-driven swirl and stronger local glow on hover. It stops offscreen/in hidden tabs and becomes static under reduced motion. If WebGL is unavailable, the normal dark background remains. It does not block text selection or navigation.
+The hero uses an emerald ribbon background across the full masthead, including navigation and the TOP-100 title, reconstructed from the supplied screenshot. Its one-pass WebGL shader drifts slowly and reacts more strongly to pointer motion. It stops offscreen/in hidden tabs and becomes static under reduced motion. If WebGL is unavailable, the normal dark background remains. It does not block text selection or navigation.
 
 Each expertise card has one stretched native button covering its whole area; keyboard interaction remains native and no nested interactive controls are introduced. Hover/focus scales the card slightly and immediately highlights its details label. Popups include the lead, explanatory paragraphs, and benefits from the Ukrainian text and mobile screenshot supplied by the user; English is a translation. `src/directionDetails.js` owns this copy.
 
@@ -62,4 +62,10 @@ Each expertise card has one stretched native button covering its whole area; key
 
 `npm run test:design` verifies the served SVG bytes, logo dimensions, screenshot colors, dropdown switching/focus, long-popup scrolling, close behavior, and 320–1440px responsiveness. It saves `previews/expla-popup-mobile.png` and `previews/expla-popup-desktop.png`.
 
-The current Figma background (`6176:31760`), direction-popup (`6176:31485`), and mobile (`6179:34540`) links still return a proxy HTTP 403 in this cloud environment. The attached screenshot is the verified visual source for the mobile popup. Other inaccessible Figma frames, the updated top-100 background asset, and the exact website font cannot be claimed as verified. The existing interactive hero shader is retained until that background is exported or accessible.
+The current Figma background (`6176:31760`), direction-popup (`6176:31485`), and mobile (`6179:34540`) links still return a proxy HTTP 403 in this cloud environment. The attached screenshot is the verified visual source for the mobile popup. Other inaccessible Figma frames, the updated top-100 background asset, cannot be claimed as verified. The first-screen background is a procedural reconstruction of the green screenshot, not an exported Figma image.
+
+## Supplied e-Ukraine fonts
+
+The six original OTF files from the user-uploaded `e-Ukraine-20261026T185604Z-1-001.zip` are self-hosted under `src/assets/fonts`: Thin (100), UltraLight (200), Light (300), Regular (400), Medium (500), and Bold (700). They are loaded through `@font-face` with `font-display: swap`, without external font services. Vite fingerprints the files and rewrites their URLs for subdirectory hosting. The original outlined SVG logo remains independent of the website font.
+
+The popup close control has a vector cross; hover/focus uses the existing green brand accent. This state is implemented and tested, but its exact Figma hover frame remains unavailable through the connected tools. The mobile header stacking order keeps the open menu above the hero text and background.

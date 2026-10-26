@@ -7,6 +7,10 @@ const { launch, baseURL } = require('./browser.cjs');
     const page = await browser.newPage({ viewport: { width: 360, height: 844 }, reducedMotion: 'reduce' });
     const errors = []; page.on('pageerror', error => errors.push(error.message));
     await page.goto(baseURL);
+    await page.evaluate(() => document.fonts.ready);
+    assert(await page.evaluate(() => document.fonts.check('400 16px "e-Ukraine"', 'Україна')), 'uploaded Ukrainian font is loaded');
+    assert(await page.evaluate(() => [...document.fonts].some(face => face.family.includes('e-Ukraine') && face.weight === '400' && face.status === 'loaded')), 'a real uploaded font face, not a fallback, is decoded');
+    assert((await page.locator('body').evaluate(e => getComputedStyle(e).fontFamily)).includes('e-Ukraine'));
     const logo = page.locator('.site-header .logo img');
     await logo.waitFor(); await logo.evaluate(img => img.decode());
     assert.equal(await logo.evaluate(img => img.naturalWidth), 202);
@@ -19,6 +23,8 @@ const { launch, baseURL } = require('./browser.cjs');
     assert.equal(await dialog.locator('.direction-dialog-body').evaluate(e => getComputedStyle(e).backgroundColor), 'rgb(32, 197, 124)');
     assert.equal(await dialog.locator('.dialog-benefits li').first().evaluate(e => getComputedStyle(e).backgroundColor), 'rgb(255, 255, 255)');
     assert.equal(await dialog.locator('.dialog-benefits li').count(), 4);
+    await dialog.getByRole('button', { name: 'Закрити', exact: true }).hover();
+    assert.equal(await dialog.getByRole('button', { name: 'Закрити', exact: true }).evaluate(e => getComputedStyle(e).color), 'rgb(32, 197, 124)', 'close control has a brand-colored hover state');
     const selector = dialog.getByRole('combobox', { name: 'Напрямок' });
     await selector.focus();
     for (let index = 1; index < 4; index++) {
@@ -38,6 +44,7 @@ const { launch, baseURL } = require('./browser.cjs');
     }
     await page.setViewportSize({ width: 360, height: 844 });
     await page.evaluate(() => document.activeElement?.blur());
+    await page.mouse.move(0, 0);
     const fullHeight = await dialog.evaluate(e => e.scrollHeight);
     await page.setViewportSize({ width: 360, height: fullHeight });
     mkdirSync('previews', { recursive: true });

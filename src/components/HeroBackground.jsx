@@ -41,20 +41,34 @@ export default function HeroBackground() {
         fragmentShader: `
           uniform float time, aspect, activity; uniform vec2 pointer; uniform vec3 base;
           varying vec2 uvPosition;
+          float ribbon(vec2 uv, float anchor, float bend, float phase){
+            float center=anchor+bend*(uv.y-.5)+.045*sin(uv.y*5.0+phase);
+            float width=.024+.015*sin(uv.y*3.2+phase);
+            float d=(uv.x-center)/width;
+            return exp(-d*d)*(.65+.35*sin(uv.y*6.0+phase));
+          }
           void main(){
             vec2 p=(uvPosition-.5)*vec2(aspect,1.0);
             vec2 mouse=(pointer-.5)*vec2(aspect,1.0);
             float radius=length(p-mouse);
-            float t=time*.13;
-            float angle=sin(t)*.09+activity*exp(-radius*2.0)*sin(radius*5.0-t)*1.3;
+            float t=time*.065;
+            float angle=activity*exp(-radius*radius*1.5)*sin(t+radius*4.0)*.65;
             mat2 turn=mat2(cos(angle),-sin(angle),sin(angle),cos(angle));
-            p=turn*(p-mouse*.25*activity);
-            float wave=sin(p.x*3.5+sin(p.y*5.0+t)*.8+t);
-            float mist=.5+.5*sin(wave*2.4+p.y*3.0-t*.7);
-            float edge=sin(uvPosition.x*3.14159)*sin(uvPosition.y*3.14159);
-            float hover=activity*exp(-radius*1.5);
-            vec3 glow=vec3(.0017,.0024,.0020)*mist+vec3(.009,.016,.011)*hover*mist;
-            gl_FragColor=vec4(base+glow*edge,1.0);
+            p=mouse+turn*(p-mouse);
+            vec2 uv=p/vec2(aspect,1.0)+.5;
+            float streams=ribbon(uv,.06,.24,t)+ribbon(uv,.17,.18,t+1.4)*.8
+              +ribbon(uv,.28,.13,t+3.0)*.55+ribbon(uv,.80,.25,t+1.0)
+              +ribbon(uv,.94,.20,t+3.8)*.7;
+            float left=(uv.x-.13)/.17;
+            float right=(uv.x-.85)/.18;
+            float haze=exp(-left*left)+exp(-right*right);
+            float center=(uvPosition.x-.5)/.23;
+            float readability=1.0-.78*exp(-center*center);
+            float edge=.4+.6*sin(uvPosition.y*3.14159);
+            float hover=1.0+activity*.5*exp(-radius*2.0);
+            vec3 emerald=vec3(.0015,.070,.034)*min(streams,1.3)
+              +vec3(.0007,.017,.009)*haze;
+            gl_FragColor=vec4(vec3(.0004,.001,.0007)+emerald*readability*edge*hover,1.0);
             #include <colorspace_fragment>
           }
         `,

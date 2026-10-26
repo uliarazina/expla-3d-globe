@@ -12,6 +12,7 @@ const { launch, baseURL } = require('./browser.cjs');
     page.on('pageerror', error => errors.push(error.message));
     page.on('response', response => { if (response.status() >= 400 && /\.(js|css|svg|geojson)(\?|$)/.test(response.url())) failedAssets.push(response.url()); });
     await page.goto(baseURL);
+    await page.evaluate(() => document.fonts.ready);
     await page.getByRole('heading', { name: 'expla топ-100 партнерів' }).waitFor();
     assert.equal(await page.locator('.direction-card').count(), 4);
     assert.equal(await page.locator('.channel-group').first().locator('.channel').count(), 9);
@@ -46,6 +47,7 @@ const { launch, baseURL } = require('./browser.cjs');
     await page.getByRole('dialog').waitFor();
     await page.keyboard.press('Escape');
     mkdirSync('previews', { recursive: true });
+    await page.locator('.masthead').screenshot({ path: 'previews/expla-hero.png' });
     // Render the offscreen globe once before full-page capture; reduced motion keeps it still.
     await page.locator('.reach').scrollIntoViewIfNeeded();
     await page.waitForSelector('canvas'); await page.waitForTimeout(600);

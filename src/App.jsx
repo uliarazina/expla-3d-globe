@@ -105,7 +105,7 @@ export default function App() {
   const modalTitle = card?.title || (modal?.type === 'career' ? t.careerTitle : modal?.type === 'blog' ? t.blogTitle : modal?.type === 'contact' ? t.contactTitle : `${modal?.network || ''} · expla`);
   return <>
     <a className="skip-link" href="#main">{t.skip}</a>
-    <header className="site-header container">
+    <header className="masthead"><HeroBackground/><div className="site-header container">
       <Logo/>
       <button className="menu-toggle" type="button" aria-expanded={menuOpen} aria-controls="site-navigation" aria-label={t.menu} onClick={() => setMenuOpen(!menuOpen)}><span/><span/></button>
       <nav id="site-navigation" className={`navigation${menuOpen ? ' is-open' : ''}`} aria-label={language === 'uk' ? 'Основна навігація' : 'Main navigation'}>
@@ -118,9 +118,8 @@ export default function App() {
       <div className="language-switch" aria-label={language === 'uk' ? 'Мова сайту' : 'Website language'}>
         <button lang="uk" aria-pressed={language === 'uk'} onClick={() => setLanguage('uk')}>UA</button><span aria-hidden="true">|</span><button lang="en" aria-pressed={language === 'en'} onClick={() => setLanguage('en')}>EN</button>
       </div>
-    </header>
+    </div><section className="hero container" id="about"><h1>{t.title}</h1><p>{t.subtitle}</p></section></header>
     <main id="main">
-      <section className="hero container" id="about"><HeroBackground/><h1>{t.title}</h1><p>{t.subtitle}</p></section>
       <section className="directions" id="directions" aria-labelledby="directions-title">
         <div className="container"><h2 id="directions-title">{t.directions}</h2>
           <div className="direction-grid">{t.cards.map((item, index) => <article className="direction-card" key={item.title}>
@@ -130,9 +129,9 @@ export default function App() {
       </section>
       <section className={`reach container${reachRevealed ? ' is-revealed' : ''}`} ref={reachRef} aria-label={t.globe}>
         <div className="reach-globe"><svg className="globe-ring" viewBox="0 0 100 100" aria-hidden="true">
-          <defs><linearGradient id={ringGradient} x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#20c57c"/><stop offset="100%" stopColor="#06492e"/></linearGradient></defs>
-          <circle className="ring-track" cx="50" cy="50" r="49"/>
-          <circle className="ring-progress" cx="50" cy="50" r="49" pathLength="100" transform="rotate(-90 50 50)" stroke={`url(#${ringGradient})`}/>
+          <defs><linearGradient id={ringGradient} x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#20c57c"/><stop offset="55%" stopColor="#138353"/><stop offset="100%" stopColor="#06492e"/></linearGradient></defs>
+          <circle className="ring-track" cx="50" cy="50" r="49"/><circle className="ring-inner" cx="50" cy="50" r="46.5"/>
+          <circle className="ring-progress" cx="50" cy="50" r="49" pathLength="100" stroke={`url(#${ringGradient})`}/>
         </svg><Globe dataUrl={`${import.meta.env.BASE_URL}data/countries.geojson`}/></div>
         <div className="reach-copy"><p className="reach-intro">{t.seen}</p><p className="reach-value">80<span>%</span></p><h2>{t.online}</h2>
           <div className="reach-meter"><span className="meter-blocks" aria-hidden="true">{Array.from({ length: 10 }, (_, index) => <i key={index} className={index < 8 ? 'is-filled' : ''} style={{ '--cube-delay': `${index * 0.26}s` }}/>)}</span><span>{t.users}</span></div>
