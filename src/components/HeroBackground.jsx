@@ -59,17 +59,21 @@ export default function HeroBackground() {
             p=mouse+turn*(p-mouse);
             vec2 uv=p/vec2(aspect,1.0)+.5;
             uv+=vec2(.025*sin(t*.8+uv.y*4.0),.018*sin(t*.6+uv.x*3.0));
-            // Curved, feathered aurora arcs follow the supplied wide reference:
-            // a bright lower-left sweep and a taller upper-right crescent.
             // Broad lower emerald sweep, fine inner filaments and a dark center.
             vec2 center=vec2(.53+.012*sin(t*.5),.78+.012*cos(t*.4));
             vec2 q=(uv-center)/vec2(.57,.90);
+            q.x+=.065*sin(q.y*2.6+t*.3);
+            q.y+=.04*sin(q.x*3.0-t*.35);
             float r=length(q);
             float flow=.85+.15*sin(atan(q.y,q.x)*3.0-t*.6);
             float lower=1.0-smoothstep(.20,.95,uv.y);
             float outer=band(r-1.0,.18)*flow;
-            float threads=.25*band(r-.88-.009*sin(t+uv.x*6.0),.012)
-              +.16*band(r-.93,.018)+.12*band(r-.72,.008);
+            float threads=0.0;
+            for(int i=0;i<6;i++){
+              float layer=float(i);
+              float strand=.73+layer*.043+.009*sin(t*.45+uv.x*5.0+layer);
+              threads+=.075*band(r-strand,.007+layer*.0015);
+            }
             float leftArc=length((uv-vec2(.34,.12))/vec2(.38,.95));
             float upperLeft=band(leftArc-1.0,.08)*smoothstep(.45,1.0,uv.y);
             float corner=band(uv.x,.17)*(1.0-uv.y);
