@@ -145,3 +145,19 @@
 .channel-track{width:max(300%,3600px)}
 /* Mobile keeps the same carousel spacing and autoplay, without navigation UI. */
 @media(max-width:760px){.channel-controls{display:none}}
+/* Keep mobile direction navigation available throughout the popup's own scroll. */
+.direction-dialog-controls{display:flow-root;padding:26px 50px 0}
+.direction-dialog-header{padding-top:0}
+@media(max-width:900px){.direction-dialog-controls{padding-inline:30px}}
+@media(max-width:600px){
+  .direction-dialog-controls{position:sticky;top:0;z-index:5;background:var(--black);padding:calc(26px + env(safe-area-inset-top)) 15px 0}
+  .direction-dialog .direction-options{max-height:min(240px,calc(100svh - 230px - env(safe-area-inset-top)));overflow-y:auto;overscroll-behavior:contain}
+  .direction-dialog{scroll-padding-top:210px}
+}
+@media(max-width:600px) and (max-height:500px){
+  .direction-dialog-controls{padding-top:calc(14px + env(safe-area-inset-top))}
+  .direction-dialog-controls .direction-dialog-toolbar{margin-bottom:16px}
+  .direction-dialog-controls .direction-select-wrap{margin-bottom:18px}
+  .direction-dialog .direction-options{max-height:calc(100svh - 170px - env(safe-area-inset-top))}
+  .direction-dialog{scroll-padding-top:160px}
+}

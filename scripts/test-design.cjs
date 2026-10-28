@@ -39,6 +39,29 @@ const { launch, baseURL } = require('./browser.cjs');
     await dialog.evaluate(e => e.scrollTo(0, e.scrollHeight));
     assert(await dialog.evaluate(e => e.scrollTop > 0), 'long mobile popup scrolls');
     assert.equal(await page.locator('body').evaluate(e => getComputedStyle(e).overflow), 'hidden');
+    const controls = dialog.locator('.direction-dialog-controls');
+    const pinnedTop = (await controls.boundingBox()).y;
+    assert(Math.abs(pinnedTop - (await dialog.boundingBox()).y) < 1, 'mobile controls stay pinned at the dialog top after scrolling');
+    for (const control of [dialog.locator('.logo img'), dialog.getByRole('button', { name: 'Закрити', exact: true }), selector]) {
+      const box = await control.boundingBox();
+      assert(box.y >= 0 && box.y + box.height <= 844, 'logo, close and direction selector remain visible at the bottom');
+    }
+    await selector.click();
+    assert.equal(await dialog.locator('.direction-options button:visible').count(), 3, 'direction menu is usable from the bottom');
+    await dialog.locator('.direction-options').getByRole('button', { name: 'PPC Team', exact: true }).click();
+    assert.equal(await dialog.locator('h2').textContent(), 'PPC Team');
+    assert.equal(await dialog.evaluate(e => e.scrollTop), 0, 'switching from the pinned menu resets the content scroll');
+    await selector.click();
+    await dialog.locator('.direction-options').getByRole('button', { name: 'Social Media Advertising', exact: true }).click();
+    await dialog.evaluate(e => e.scrollTo(0, e.scrollHeight));
+    await page.screenshot({ path: 'previews/expla-popup-mobile-sticky.png' });
+    await page.setViewportSize({ width: 568, height: 320 });
+    await dialog.evaluate(e => e.scrollTo(0, e.scrollHeight));
+    await selector.click();
+    const options = await dialog.locator('.direction-options').boundingBox();
+    assert(options.y >= 0 && options.y + options.height <= 320, 'landscape direction menu fits and scrolls in the viewport');
+    await selector.click();
+    await page.setViewportSize({ width: 360, height: 844 });
     await dialog.evaluate(e => e.scrollTo(0, 0));
     for (const width of [320, 360, 390, 768, 1440]) {
       await page.setViewportSize({ width, height: 844 }); await page.waitForTimeout(100);
