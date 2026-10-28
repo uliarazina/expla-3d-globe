@@ -85,6 +85,16 @@ const { launch, baseURL } = require('./browser.cjs');
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     const resumed = await phase(); await page.waitForTimeout(300);
     assert((await phase()) < resumed, 'automatic motion resumes after manual navigation');
+    for (const width of [360, 390, 760]) {
+      await page.setViewportSize({ width, height: 844 });
+      assert.equal(await page.locator('.channel-controls button:visible').count(), 0, 'mobile carousel has no arrow buttons');
+      await strip.scrollIntoViewIfNeeded();
+      const mobilePhase = await phase(); await page.waitForTimeout(250);
+      assert((await phase()) < mobilePhase, 'mobile carousel still moves right to left');
+      assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'no horizontal page overflow');
+    }
+    await page.setViewportSize({ width: 1085, height: 900 });
+    assert.equal(await page.locator('.channel-controls button:visible').count(), 2, 'desktop retains both arrows');
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.evaluate(() => scrollTo({ top: 0, behavior: 'instant' })); await page.waitForTimeout(400);
     const staticShader = await background.screenshot(); await page.waitForTimeout(400);

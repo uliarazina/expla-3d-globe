@@ -17,7 +17,8 @@
     "test:design": "node scripts/test-design.cjs",
     "test:quality": "node scripts/test-globe-quality.cjs",
     "test:markers": "node scripts/test-markers.mjs",
-    "test:desktop-quality": "node scripts/test-desktop-quality.cjs"
+    "test:desktop-quality": "node scripts/test-desktop-quality.cjs",
+    "benchmark:radar": "node scripts/benchmark-radar.cjs"
   },
   "dependencies": {
     "d3-geo": "^3.1.1",

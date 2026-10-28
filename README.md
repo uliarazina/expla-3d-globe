@@ -4,7 +4,7 @@ A standalone React + Three.js globe with a transparent background, bright green 
 
 - **Website and publication:** [Full-site guide](docs/WEBSITE.md)
 - **Integrate:** [Developer handoff](docs/INTEGRATION.md)
-- **Component:** [Globe.jsx](src/components/Globe.jsx), [Globe.css](src/components/Globe.css), and [globeMaterial.js](src/components/globeMaterial.js)
+- **Component:** [Globe.jsx](src/components/Globe.jsx), [Globe.css](src/components/Globe.css), and [globeMaterial.js](src/components/globeMaterial.js), and [globeMarkers.js](src/components/globeMarkers.js)
 - **Video:** [10-second MP4, 30 FPS](previews/expla-globe-30fps.mp4)
 - **Measurements and recording details:** [Preview notes](previews/README.md)
 

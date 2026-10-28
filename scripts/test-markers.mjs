@@ -20,8 +20,19 @@ try {
   const page = await browser.newPage(); await page.goto(browserTools.baseURL);
   const result = await page.evaluate(async () => (await import('/scripts/fixtures/marker-scene.js')).checkMarkerRendering());
   assert(result.parented && result.count === 22);
-  assert(result.front > 0, 'front-facing marker produces white pixels');
-  assert.equal(result.back, 0, 'the same marker disappears after a half-turn behind the sphere');
-  assert.equal(result.faded, 0, 'the marker gently fades completely at its own pulse trough');
-  console.log('PASS: all 22 countries, geographic containment, surface attachment, real WebGL front/back occlusion and fade.', result);
+  assert(result.early.yellow > 0, 'yellow centre and ring are visible');
+  assert(result.expanded.width > result.early.width + 5, 'ring visibly expands in screen pixels');
+  assert(result.expanded.width >= 20 && result.expanded.width <= 32, 'desktop ring has the requested diameter');
+  assert(Math.abs(result.expanded.width-result.expanded.height) <= 1, 'ring is circular, not flattened by sphere rotation');
+  assert.equal(result.back.yellow, 0, 'the same marker is invisible on the back');
+  assert.equal(result.faded.yellow, 0, 'ring fades to full transparency');
+  assert(result.limb.yellow > 0 && result.limb.outside === 0, 'limb pulse remains clipped inside the sphere silhouette');
+  assert.deepEqual(result.staticA, result.staticB, 'reduced motion keeps static yellow dots');
+  for (const sample of result.budget) {
+    assert.equal(sample.visited, 22, 'every country eventually pulses while the globe rotates');
+    assert(sample.maximum <= (sample.mobile ? 2 : 4), 'pulse scheduler stays within the mobile/desktop budget');
+    assert.equal(sample.diameter, sample.mobile ? 22 : 28);
+  }
+  console.log('PASS: all 22 geographic locations, yellow expanding circular radar rings, full fade, backside/silhouette clipping, staggered budgets and reduced motion.', result);
+
 } finally { await browser.close(); }

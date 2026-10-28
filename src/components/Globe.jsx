@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { geoEquirectangular, geoPath, geoArea } from 'd3-geo';
 import './Globe.css';
 import { createGlobeMaterial } from './globeMaterial.js';
-import { createGlobeMarkers } from './globeMarkers.js';
+import { createGlobeMarkers, updateGlobeMarkers, resizeGlobeMarkers } from './globeMarkers.js';
 
 /** Standalone, transparent globe. The parent controls its size. */
 export default function Globe({
@@ -62,7 +62,7 @@ export default function Globe({
       // Keep the angle unwrapped, avoiding a discontinuity at the loop boundary.
       if (spinning) globe.rotation.y += (Math.PI * 2 / rotationPeriod) * delta;
       elapsed += delta;
-      if (markers) markers.material.uniforms.time.value = elapsed;
+      if (markers) updateGlobeMarkers(markers, { time: elapsed, camera, mobile: window.innerWidth <= 760, reducedMotion: motion.matches });
       renderer.render(scene, camera);
       onFrame?.({ timestamp, delta, elapsed, rotation: globe.rotation.y, axisTilt: globe.rotation.x,
         drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles,
@@ -216,11 +216,14 @@ export default function Globe({
           const { width, height } = host.getBoundingClientRect();
           if (!width || !height) return;
           renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, Math.max(1, maxPixelRatio)));
-          if (markers) markers.material.uniforms.pixelRatio.value = renderer.getPixelRatio();
           renderer.setSize(width, height);
           camera.aspect = width / height; camera.updateProjectionMatrix();
           // Fit a complete sphere even in portrait-shaped embedding containers.
           camera.position.setLength(3.7 / Math.min(1, camera.aspect));
+          if (markers) {
+            const ratio = renderer.getPixelRatio();
+            resizeGlobeMarkers(markers, { width: renderer.domElement.width / ratio, height: renderer.domElement.height / ratio, pixelRatio: ratio, camera });
+          }
           resetTime();
         };
         resizeObserver = new ResizeObserver(resize); resizeObserver.observe(host); resize();

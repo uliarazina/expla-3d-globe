@@ -143,3 +143,5 @@
 .powered-by{font-size:12px;font-weight:700}.powered-by>span{font-size:18px}
 @media(max-width:760px){.masthead{padding-bottom:26px}.masthead+main>.directions{clip-path:polygon(0 0,100% 0,100% 100%,35% calc(100% - 20px),0 100%)}.channels-heading{flex-wrap:wrap;padding-bottom:30px;gap:16px}.channel-controls{margin-left:auto}.channel-controls button{width:44px;height:44px}.footer-brands{justify-content:center;gap:18px;font-size:13px}.site-footer{padding-top:24px;padding-bottom:24px}}
 .channel-track{width:max(300%,3600px)}
+/* Mobile keeps the same carousel spacing and autoplay, without navigation UI. */
+@media(max-width:760px){.channel-controls{display:none}}
