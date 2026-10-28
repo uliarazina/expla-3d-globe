@@ -41,7 +41,7 @@ const { launch, baseURL } = require('./browser.cjs');
     assert.equal(await page.locator('body').evaluate(e => getComputedStyle(e).overflow), 'hidden');
     const controls = dialog.locator('.direction-dialog-controls');
     const pinnedTop = (await controls.boundingBox()).y;
-    assert(Math.abs(pinnedTop - (await dialog.boundingBox()).y) < 1, 'mobile controls stay pinned at the dialog top after scrolling');
+    assert(Math.abs(pinnedTop - (await dialog.boundingBox()).y) <= 1.1, 'mobile controls stay pinned at the dialog top after scrolling');
     for (const control of [dialog.locator('.logo img'), dialog.getByRole('button', { name: 'Закрити', exact: true }), selector]) {
       const box = await control.boundingBox();
       assert(box.y >= 0 && box.y + box.height <= 844, 'logo, close and direction selector remain visible at the bottom');

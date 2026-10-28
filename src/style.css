@@ -161,3 +161,5 @@
   .direction-dialog .direction-options{max-height:calc(100svh - 170px - env(safe-area-inset-top))}
   .direction-dialog{scroll-padding-top:160px}
 }
+/* Subtle outline around each popup, including full-screen mobile dialogs. */
+.info-dialog,.info-dialog.direction-dialog{border:1px solid rgb(190 190 190 / 30%)}
