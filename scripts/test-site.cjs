@@ -60,9 +60,9 @@ const { launch, baseURL } = require('./browser.cjs');
       assert(await page.evaluate(() => {
         const field = document.querySelector('.hero-background canvas').getBoundingClientRect();
         const section = document.querySelector('.directions');
-        const notch = parseFloat(getComputedStyle(section).clipPath.match(/65% ([\d.]+)px/)[1]);
-        return field.bottom >= section.getBoundingClientRect().top + notch;
-      }), `shader covers the angled corner at ${width}`);
+        return Math.abs(field.bottom - section.getBoundingClientRect().top) < 1
+          && getComputedStyle(section).clipPath.startsWith('polygon(0px 0px, 100% 0px');
+      }), `hero has a straight, fully covered boundary at ${width}`);
     }
     await page.setViewportSize({ width: 390, height: 844 }); await page.waitForTimeout(250);
     await page.evaluate(() => scrollTo(0, 0));
@@ -71,7 +71,7 @@ const { launch, baseURL } = require('./browser.cjs');
     await page.locator('#site-navigation').getByRole('link', { name: 'Наші напрямки', exact: true }).click();
     assert.equal(await page.locator('.menu-toggle').getAttribute('aria-expanded'), 'false');
     assert.equal(new URL(page.url()).hash, '#directions');
-    await page.locator('.reach').scrollIntoViewIfNeeded(); await page.waitForTimeout(500);
+    await page.locator('.reach-globe canvas').scrollIntoViewIfNeeded(); await page.waitForTimeout(500);
     await page.evaluate(() => document.activeElement?.blur());
     await page.screenshot({ path: 'previews/expla-website-mobile.png', fullPage: true });
     assert.deepEqual(errors, []); assert.deepEqual(failedAssets, []);

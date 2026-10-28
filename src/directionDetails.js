@@ -1,11 +1,10 @@
-// Copy and benefit labels follow the supplied desktop popup designs.
+// Ukrainian copy follows the supplied final popup screenshots; English is its translation.
 export const directionDetails = {
   "uk": [
     {
       "lead": "З 2015 року залучаємо користувачів через рекламу у Meta, Instagram, Snapchat, TikTok та X (Twitter)",
       "paragraphs": [
-        "Будуємо маркетингові воронки для діджитал-компаній у різних напрямах. Поєднуємо креативний підхід з аналітикою, щоб знаходити потрібну аудиторію та перетворювати її інтерес на цільові дії.",
-        "Досліджуємо продукт партнера й потреби потенційних клієнтів, проєктуємо їхній шлях до покупки та працюємо з даними на кожному етапі. Це допомагає коригувати кампанії й підвищувати ефективність залучення."
+        "Будуємо маркетингові воронки для діджитал-компаній у різних напрямах. Поєднуємо креативи й аналітику, щоб вести користувачів від першого контакту до покупки"
       ],
       "benefits": [
         [
@@ -32,8 +31,7 @@ export const directionDetails = {
     {
       "lead": "Залучаємо користувачів для наших партнерів через Google Ads, Microsoft Ads та інші рекламні платформи",
       "paragraphs": [
-        "Працюємо з пошуковою, медійною та нативною рекламою різних діджитал-компаній на ринках англомовних країн. Будуємо маркетингові воронки, які ведуть користувача від рекламного оголошення до реєстрації чи покупки на сайті партнера.",
-        "Наші сайти допомагають користувачам ознайомитися з продуктами й сервісами та обрати потрібну пропозицію. Відстежуємо ефективність рекламних кампаній, аналізуємо цільові дії та оптимізуємо витрати на залучення. Робимо фокус на результатах, які приносять дохід нашим партнерам і команді."
+        "Працюємо з пошуковою, медійною та нативною рекламою різних діджитал-компаній на ринках англомовних країн. Запускаємо рекламу в Google Ads та інших рекламних системах. Через власні сайти допомагаємо користувачам обирати продукти й приводимо клієнтів нашим партнерам"
       ],
       "benefits": [
         [
@@ -60,8 +58,7 @@ export const directionDetails = {
     {
       "lead": "Створюємо та розвиваємо власні онлайн-проєкти, які залучають користувачів із пошуку Google та Bing",
       "paragraphs": [
-        "Працюємо з різними діджитал-компаніями на міжнародних ринках. Досліджуємо, що шукають користувачі, створюємо контент під їхні запити та розвиваємо сайти, які допомагають обирати потрібні продукти й сервіси.",
-        "Поєднуємо SEO, контент, аналітику й технічну розробку, щоб залучати більше користувачів із пошукових систем та приводити клієнтів нашим партнерам. Команда відповідає за повний цикл розвитку проєктів — від вибору ніші й запуску сайту до його зростання та монетизації."
+        "Працюємо з різними діджитал-компаніями на міжнародних ринках. Поєднуємо SEO, контент, аналітику й технічну розробку, щоб залучати більше користувачів із пошукових систем та приводити клієнтів нашим партнерам."
       ],
       "benefits": [
         [
@@ -140,8 +137,7 @@ export const directionDetails = {
     {
       "lead": "Acquiring users through Meta, Instagram, Snapchat, TikTok, and X (Twitter) advertising since 2015",
       "paragraphs": [
-        "We build marketing funnels for digital companies, bringing creative thinking and analytics together to find the right audience and turn interest into action.",
-        "We research our partners’ products and customers’ needs, design the path to purchase, and work with data at every stage to improve acquisition."
+        "We build marketing funnels for digital companies across different sectors. We combine creative work and analytics to guide users from their first interaction to purchase."
       ],
       "benefits": [
         [
@@ -168,8 +164,7 @@ export const directionDetails = {
     {
       "lead": "Acquiring users for our partners through Google Ads, Microsoft Ads, and other advertising platforms",
       "paragraphs": [
-        "We work with search, display, and native advertising for digital companies in English-speaking markets. Our funnels take users from an ad to a registration or purchase.",
-        "Our websites help users discover products and services and choose the right offer. We analyze conversions and optimize acquisition costs."
+        "We work with search, display, and native advertising for digital companies in English-speaking markets. We launch campaigns in Google Ads and other advertising systems. Through our own websites, we help users choose products and bring customers to our partners."
       ],
       "benefits": [
         [
@@ -196,8 +191,7 @@ export const directionDetails = {
     {
       "lead": "Creating and growing our own online projects that attract users from Google and Bing search",
       "paragraphs": [
-        "We research what people search for, create content around their needs, and develop websites that help them choose products and services.",
-        "We combine SEO, content, analytics, and engineering across the full project lifecycle, from niche selection and launch to growth and monetization."
+        "We work with digital companies in international markets. We combine SEO, content, analytics, and technical development to attract more search users and bring customers to our partners."
       ],
       "benefits": [
         [

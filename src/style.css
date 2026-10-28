@@ -121,3 +121,25 @@
 @media(max-width:600px){.direction-dialog .dialog-benefits.is-collapsed li:nth-child(n+5){display:none}.benefits-toggle{display:flex;justify-content:space-between;align-items:center;width:100%;margin-top:24px;padding:18px 16px;background:var(--black);color:white;text-align:left;font-size:16px}.benefits-toggle span{font-size:24px;line-height:1}.direction-dialog .dialog-benefits h4{font-size:20px}.direction-dialog .dialog-benefits li{padding:24px 18px;min-height:96px}.direction-dialog .direction-dialog-description p{font-size:18px}.direction-dialog .direction-dialog-lead{font-size:24px}.direction-dialog-description{gap:34px}.direction-dialog-header{padding-bottom:50px}.direction-dialog h2{font-size:32px}.direction-stats dd{font-size:22px}.direction-stats dl>div{min-height:170px}.direction-dialog-body:has(+.direction-stats){padding-bottom:0}}
 @media(max-width:520px){.reach-copy{order:-1;text-align:left}.reach{gap:48px}.reach-intro{font-size:16px}.reach-copy h2{font-size:23px}.reach-value{font-size:145px}.reach-meter{justify-content:flex-start;flex-wrap:wrap;gap:12px}.reach-meter>span{flex-basis:100%}.reach-globe{width:min(100%,350px)}.site-footer>.logo{display:none}.site-footer{min-height:88px;padding-block:24px}}
 @media(max-width:350px){.direction-dialog .dialog-benefits h4{font-size:18px}.direction-dialog .direction-dialog-lead{font-size:22px}.direction-dialog .direction-dialog-description p{font-size:16px}}
+/* Final targeted refinements, shared by desktop and mobile. */
+:root{--green:#27c77c}
+.masthead{padding-bottom:30px;margin-bottom:0}
+.masthead+main>.directions{margin-top:0;clip-path:polygon(0 0,100% 0,100% 100%,35% calc(100% - 32px),0 100%);padding-top:40px}
+.direction-card{transition:none}
+.direction-card:hover,.direction-card:focus-within{transform:none;box-shadow:none}
+.card-tags,.detail-button,.detail-button svg{transition:color .225s ease,transform .225s ease}
+.direction-card:hover .card-tags,.direction-card:focus-within .card-tags{color:white}
+.direction-card:hover .detail-button svg,.direction-card:focus-within .detail-button svg{transform:translateX(5px)}
+.direction-card:hover .detail-button,.direction-card:focus-within .detail-button{border-top-color:#313135}
+.direction-dialog-description{display:block;max-width:750px}
+.direction-dialog .direction-dialog-description p+p{margin-top:24px}
+.channel-strip{overflow:hidden;touch-action:pan-y}
+.channels-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding-bottom:50px}
+.channels-heading h2{margin-bottom:0}
+.channel-controls{display:flex;gap:8px;flex-shrink:0}
+.channel-controls button{display:grid;place-items:center;width:48px;height:48px;border:1px solid var(--black);background:white;color:var(--black);font-size:30px;line-height:1;transition:background-color .2s,color .2s}
+.channel-controls button:hover,.channel-controls button:focus-visible{background:var(--black);color:white}
+.footer-brands{display:flex;align-items:center;gap:30px;flex-wrap:wrap;font-size:16px}
+.powered-by{font-size:12px;font-weight:700}.powered-by>span{font-size:18px}
+@media(max-width:760px){.masthead{padding-bottom:26px}.masthead+main>.directions{clip-path:polygon(0 0,100% 0,100% 100%,35% calc(100% - 20px),0 100%)}.channels-heading{flex-wrap:wrap;padding-bottom:30px;gap:16px}.channel-controls{margin-left:auto}.channel-controls button{width:44px;height:44px}.footer-brands{justify-content:center;gap:18px;font-size:13px}.site-footer{padding-top:24px;padding-bottom:24px}}
+.channel-track{width:max(300%,3600px)}

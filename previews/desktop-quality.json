@@ -1,0 +1,53 @@
+{
+  "atlasWidth": 4096,
+  "samples": [
+    {
+      "viewport": 1440,
+      "dpr": 1,
+      "cssWidth": 527.125,
+      "bufferWidth": 527,
+      "cssHeight": 527.125,
+      "bufferHeight": 527
+    },
+    {
+      "viewport": 1920,
+      "dpr": 1,
+      "cssWidth": 527.0625,
+      "bufferWidth": 527,
+      "cssHeight": 527.0625,
+      "bufferHeight": 527
+    },
+    {
+      "viewport": 2560,
+      "dpr": 1,
+      "cssWidth": 527.0625,
+      "bufferWidth": 527,
+      "cssHeight": 527.0625,
+      "bufferHeight": 527
+    },
+    {
+      "viewport": 1440,
+      "dpr": 2,
+      "cssWidth": 527.125,
+      "bufferWidth": 1054,
+      "cssHeight": 527.125,
+      "bufferHeight": 1054
+    },
+    {
+      "viewport": 1920,
+      "dpr": 2,
+      "cssWidth": 527.0625,
+      "bufferWidth": 1054,
+      "cssHeight": 527.0625,
+      "bufferHeight": 1054
+    },
+    {
+      "viewport": 2560,
+      "dpr": 2,
+      "cssWidth": 527.0625,
+      "bufferWidth": 1054,
+      "cssHeight": 527.0625,
+      "bufferHeight": 1054
+    }
+  ]
+}

@@ -8,7 +8,7 @@ Primary animation reference: **[expla-globe-30fps.mp4](expla-globe-30fps.mp4)** 
 - The old recording captured only 25 unique screenshots in eight seconds (about 3 FPS). Encoding that sequence into a higher-FPS video duplicated frames and did not make motion smoother. The old GIF is removed to avoid using it as a current reference.
 - This machine uses Chromium with ANGLE/SwiftShader software WebGL. The original scene measured approximately 38 FPS. Its animation also clipped frame deltas to 50 ms, making rotation slower when rendering fell below 20 FPS.
 
-The replacement uses actual rAF time with no frame-delta clipping, one draw call, a prebaked coastline atlas, vertex-based studio lighting, and a configurable pixel-density cap. It targets the display's refresh rate when the device supports it. Software rendering remains a limitation; a constant-rate recording is not proof of real-time 60 FPS.
+The replacement uses actual rAF time with no frame-delta clipping, two draw calls (sphere and subtle location dots), a prebaked coastline atlas, vertex-based studio lighting, and a configurable pixel-density cap. It targets the display's refresh rate when the device supports it. Software rendering remains a limitation; a constant-rate recording is not proof of real-time 60 FPS.
 
 ## Live browser measurements
 
@@ -36,3 +36,5 @@ The latest preview uses horizontal-only interaction and corrected Ukraine geomet
 The current globe has softer rim/specular highlights. The website previews now include the original uploaded SVG logo. [Mobile popup](expla-popup-mobile.png) and [desktop popup](expla-popup-desktop.png) show the layout based on the supplied mobile example, including the direction selector and white benefit cards.
 
 For image sharpness, use the full-size [Retina PNG](expla-globe-transparent.png); the MP4 is a smaller 640×640 motion reference. The latest globe uses a regular spherical mesh with shader coast relief, 4K atlases and a 2× pixel-density cap. The separate quality test measures its rendered alpha silhouette rather than inferring quality from a configuration setting.
+
+Latest desktop sharpness and native drawing-buffer results: [`desktop-quality.json`](desktop-quality.json), covering 1440/1920/2560 at DPR 1 and 2, plus [`expla-globe-desktop-retina.png`](expla-globe-desktop-retina.png). Marker geography and front/back occlusion are verified by `npm run test:markers`. The latest MP4 includes the 22 independently fading geographic dots and retains the 60-second rotation.

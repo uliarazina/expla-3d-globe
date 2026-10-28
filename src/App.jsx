@@ -136,12 +136,12 @@ export default function App() {
           <div className="reach-meter"><span className="meter-blocks" aria-hidden="true">{Array.from({ length: 10 }, (_, index) => <i key={index} className={index < 8 ? 'is-filled' : ''} style={{ '--cube-delay': `${index * 0.26}s` }}/>)}</span><span>{t.users}</span></div>
         </div>
       </section>
-      <section className="channels" aria-labelledby="channels-title"><div className="container channels-heading"><p className="section-eyebrow"><i aria-hidden="true"/>{t.zone}</p><h2 id="channels-title">{t.channelsStart}<br/>{t.channelsEnd} <span>{t.result}</span></h2></div>
-        <PartnerStrip items={['Google', 'Meta', 'Microsoft', 'Native Ads', 'TikTok', 'Snapchat', 'X', 'SEO', 'Affiliate Network']} renderItem={name => <ChannelLogo name={name}/>} label={language === 'uk' ? 'Рекламні платформи' : 'Advertising platforms'}/>
+      <section className="channels" aria-labelledby="channels-title">
+        <PartnerStrip language={language} heading={<><p className="section-eyebrow"><i aria-hidden="true"/>{t.zone}</p><h2 id="channels-title">{t.channelsStart}<br/>{t.channelsEnd} <span>{t.result}</span></h2></>} items={['Google', 'Meta', 'Microsoft', 'Native Ads', 'TikTok', 'Snapchat', 'X', 'SEO', 'Affiliate Network']} renderItem={name => <ChannelLogo name={name}/>} label={language === 'uk' ? 'Рекламні платформи' : 'Advertising platforms'}/>
 
       </section>
     </main>
-    <footer className="site-footer container"><Logo small/><div className="social-links">{['Facebook', 'Instagram', 'LinkedIn'].map(network => <button key={network} onClick={() => open({ type: 'social', network })}>{network}</button>)}</div></footer>
+    <footer className="site-footer container"><div className="footer-brands"><span className="powered-by">POWERED BY <span>expla:</span></span><span>Cpamatica</span><span>TRAFFIC kitchen</span><span>adoly</span></div><div className="social-links">{['Facebook', 'Instagram', 'LinkedIn'].map(network => <button key={network} onClick={() => open({ type: 'social', network })}>{network}</button>)}</div></footer>
     {modal && <dialog className={`info-dialog${card ? ' direction-dialog' : ''}`} ref={dialog} aria-labelledby="dialog-title" onCancel={event => { event.preventDefault(); setModal(null); }} onClick={event => { if (event.target === event.currentTarget) { const r = event.currentTarget.getBoundingClientRect(); if (event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom) setModal(null); } }}>
       {card ? <DirectionDialogContent language={language} cards={t.cards} index={modal.index} closeLabel={t.close} onClose={() => setModal(null)} onChange={index => { setModal({ type: 'direction', index }); dialog.current.scrollTop = 0; }}/>
         : <><button className="dialog-close" type="button" aria-label={t.close} onClick={() => setModal(null)} autoFocus>×</button>

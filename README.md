@@ -22,6 +22,8 @@ npm run test:animations
 npm run test:interactions
 npm run test:design
 npm run test:quality
+npm run test:markers
+npm run test:desktop-quality
 npm run test:geography
 npm run test:smoke
 ```

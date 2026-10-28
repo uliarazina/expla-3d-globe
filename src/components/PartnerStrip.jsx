@@ -1,91 +1,67 @@
 import React, { useEffect, useRef } from 'react';
 
-/** Autonomous rightward loop with a bounded, reversible wheel-controlled pass. */
-export default function PartnerStrip({ items, renderItem, label }) {
+/** A continuous leftward loop. Wheel events remain ordinary page scrolling. */
+export default function PartnerStrip({ items, renderItem, label, heading, language = 'uk' }) {
   const root = useRef(null);
+  const navigate = useRef(() => {});
   useEffect(() => {
-    const host = root.current;
-    const track = host.querySelector('.channel-track');
+    const host = root.current, track = host.querySelector('.channel-track');
     const group = host.querySelector('.channel-group');
     const motion = matchMedia('(prefers-reduced-motion: reduce)');
-    let frame, last = null, offset = 0, groupWidth = 0, maximum = 0;
-    let manual = false, position = 0, wheelUntil = 0, visible = true;
+    let frame = null, last = null, offset = 0, groupWidth = 0, pending = 0, visible = true;
     let touchId = null, touchX = 0;
-    const draw = () => { track.style.transform = `translate3d(${offset}px,0,0)`; };
-    const resize = () => {
-      groupWidth = group.getBoundingClientRect().width;
-      maximum = Math.max(0, groupWidth - host.clientWidth);
-      position = Math.min(position, maximum);
-      offset = manual ? -position : -groupWidth;
-      draw();
+    const draw = () => {
+      if (groupWidth > 0) offset = -(((-offset % groupWidth) + groupWidth) % groupWidth);
+      track.style.transform = `translate3d(${offset}px,0,0)`;
     };
+    const schedule = () => { if (frame === null) frame = requestAnimationFrame(tick); };
     const tick = time => {
-      const delta = last === null ? 0 : Math.min((time - last) / 1000, 0.1);
+      frame = null;
+      const delta = last === null ? 0 : Math.min((time - last) / 1000, .1);
       last = time;
-      if (!document.hidden && visible && !motion.matches && time >= wheelUntil) {
-        offset += 22 * delta;
-        if (offset >= 0) offset -= groupWidth;
+      if (visible && !document.hidden) {
+        const step = motion.matches ? pending : pending * (1 - Math.exp(-delta * 9));
+        pending -= step; offset += step;
+        if (!motion.matches && touchId === null) offset -= 42 * delta;
         draw();
       }
-      frame = requestAnimationFrame(tick);
+      if (!motion.matches || Math.abs(pending) > .1) schedule();
+      else last = null;
     };
-    const wheel = event => {
-      if (event.ctrlKey || !maximum) return;
-      const raw = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
-      if (!raw) return;
-      if (!manual) {
-        // A single finite pass, independent of the autonomous loop's current phase.
-        manual = true; position = 0;
-      }
-      const delta = raw * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? host.clientHeight : 1);
-      const next = Math.min(maximum, Math.max(0, position + delta));
-      wheelUntil = performance.now() + 900;
-      // At either boundary, leave the wheel event to the page: no scroll trap.
-      if (Math.abs(next - position) < 0.01) return;
-      event.preventDefault();
-      position = next; offset = -position;
-      host.dataset.wheelPosition = String(position);
-      host.dataset.wheelMaximum = String(maximum);
-      draw();
-    };
-    const leave = () => { manual = false; };
+    navigate.current = direction => { pending += direction * (group.children[0]?.getBoundingClientRect().width || 200); schedule(); };
+    const resize = () => { groupWidth = group.getBoundingClientRect().width; draw(); last = null; schedule(); };
+    const reset = () => { last = null; schedule(); };
     const key = event => {
       if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
-      event.preventDefault(); manual = true;
-      position = Math.min(maximum, Math.max(0, position + (event.key === 'ArrowRight' ? 120 : -120)));
-      offset = -position; wheelUntil = performance.now() + 900; draw();
+      event.preventDefault(); navigate.current(event.key === 'ArrowRight' ? -1 : 1);
     };
-    const touchStart = event => {
+    const down = event => {
       if (event.pointerType !== 'touch' || !event.isPrimary) return;
-      touchId = event.pointerId; touchX = event.clientX;
-      manual = true; position = Math.min(maximum, Math.max(0, -offset));
-      host.setPointerCapture(touchId);
+      touchId = event.pointerId; touchX = event.clientX; pending = 0; host.setPointerCapture(touchId);
     };
-    const touchMove = event => {
-      if (event.pointerId !== touchId) return;
-      position = Math.min(maximum, Math.max(0, position + touchX - event.clientX));
-      touchX = event.clientX; offset = -position; wheelUntil = performance.now() + 900; draw();
-    };
-    const touchEnd = () => { touchId = null; };
-    const reset = () => { last = null; };
-    const touchEvents = { pointerdown: touchStart, pointermove: touchMove, pointerup: touchEnd, pointercancel: touchEnd };
-    for (const [type, handler] of Object.entries(touchEvents)) host.addEventListener(type, handler);
-    host.addEventListener('wheel', wheel, { passive: false });
-    host.addEventListener('pointerleave', leave); host.addEventListener('keydown', key);
-    document.addEventListener('visibilitychange', reset);
+    const move = event => { if (event.pointerId !== touchId) return; offset += event.clientX - touchX; touchX = event.clientX; draw(); };
+    const up = () => { touchId = null; reset(); };
+    const events = { keydown: key, pointerdown: down, pointermove: move, pointerup: up, pointercancel: up };
+    for (const [name, handler] of Object.entries(events)) host.addEventListener(name, handler);
+    document.addEventListener('visibilitychange', reset); motion.addEventListener('change', reset);
     const observer = new ResizeObserver(resize); observer.observe(host); observer.observe(group);
-    const intersection = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; last = null; }); intersection.observe(host);
-    resize(); frame = requestAnimationFrame(tick);
+    const intersection = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; reset(); }); intersection.observe(host);
+    resize();
     return () => {
-      cancelAnimationFrame(frame); observer.disconnect(); intersection.disconnect();
-      for (const [type, handler] of Object.entries(touchEvents)) host.removeEventListener(type, handler);
-      host.removeEventListener('wheel', wheel); host.removeEventListener('pointerleave', leave);
-      host.removeEventListener('keydown', key); document.removeEventListener('visibilitychange', reset);
+      cancelAnimationFrame(frame); observer.disconnect(); intersection.disconnect(); navigate.current = () => {};
+      for (const [name, handler] of Object.entries(events)) host.removeEventListener(name, handler);
+      document.removeEventListener('visibilitychange', reset); motion.removeEventListener('change', reset);
     };
   }, [items.length]);
-  return <div className="channel-strip" ref={root} tabIndex={0} role="region" aria-label={label}>
-    <div className="channel-track">{[0, 1].map(group => <div className={`channel-group${group ? ' channel-group--duplicate' : ''}`} key={group} aria-hidden={group ? true : undefined}>
-      {items.map((name, index) => <div className="channel" key={name}><span className="channel-number">{String(index + 1).padStart(2, '0')}</span>{renderItem(name)}</div>)}
-    </div>)}</div>
-  </div>;
+  return <>
+    <div className="container channels-heading"><div>{heading}</div><div className="channel-controls">
+      <button type="button" aria-label={language === 'uk' ? 'Попередні платформи' : 'Previous platforms'} onClick={() => navigate.current(1)}>‹</button>
+      <button type="button" aria-label={language === 'uk' ? 'Наступні платформи' : 'Next platforms'} onClick={() => navigate.current(-1)}>›</button>
+    </div></div>
+    <div className="channel-strip" ref={root} tabIndex={0} role="region" aria-label={label}>
+      <div className="channel-track">{[0, 1].map(group => <div className={`channel-group${group ? ' channel-group--duplicate' : ''}`} key={group} aria-hidden={group ? true : undefined}>
+        {items.map((name, index) => <div className="channel" key={name}><span className="channel-number">{String(index + 1).padStart(2, '0')}</span>{renderItem(name)}</div>)}
+      </div>)}</div>
+    </div>
+  </>;
 }

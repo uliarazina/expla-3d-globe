@@ -20,7 +20,7 @@ const { launch, baseURL } = require('./browser.cjs');
     const dialog = page.getByRole('dialog'); await dialog.waitFor();
     assert.equal(await dialog.locator('.logo img').count(), 1);
     assert.equal(Math.round((await dialog.boundingBox()).width), 360);
-    assert.equal(await dialog.locator('.direction-dialog-body').evaluate(e => getComputedStyle(e).backgroundColor), 'rgb(32, 197, 124)');
+    assert.equal(await dialog.locator('.direction-dialog-body').evaluate(e => getComputedStyle(e).backgroundColor), 'rgb(39, 199, 124)');
     assert.equal(await dialog.locator('.dialog-benefits li').first().evaluate(e => getComputedStyle(e).backgroundColor), 'rgb(255, 255, 255)');
     assert.equal(await dialog.locator('.dialog-benefits li').count(), 4);
     await dialog.getByRole('button', { name: 'Закрити', exact: true }).hover();

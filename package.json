@@ -15,7 +15,9 @@
     "test:animations": "node scripts/test-animations.cjs",
     "test:interactions": "node scripts/test-interactions.cjs",
     "test:design": "node scripts/test-design.cjs",
-    "test:quality": "node scripts/test-globe-quality.cjs"
+    "test:quality": "node scripts/test-globe-quality.cjs",
+    "test:markers": "node scripts/test-markers.mjs",
+    "test:desktop-quality": "node scripts/test-desktop-quality.cjs"
   },
   "dependencies": {
     "d3-geo": "^3.1.1",

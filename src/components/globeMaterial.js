@@ -44,11 +44,11 @@ export function createGlobeMaterial({ colorMap, reliefMap, relief, rimStrength }
         float bevelLight = clamp(-slope.x * 0.6 + slope.y * 0.8, -1.0, 1.0);
         vec3 base = texture2D(colorMap, globeUv).rgb;
         vec3 color = base * mix(0.25 + 0.75 * lighting.x, 0.68 + 0.32 * lighting.x, land);
-        color *= 1.0 - bevel * land * min(relief * 28.0, 0.65);
+        color *= 1.0 - bevel * land * min(relief * 18.0, 0.65);
         color += vec3(0.06) * max(bevelLight, 0.0) * land * min(relief * 85.0, 1.0);
         color += vec3(lighting.y * mix(0.20, 0.075, land));
         float coastShadow = (1.0 - land) * coast.a;
-        color *= 1.0 - coastShadow * min(relief * 55.0, 0.85);
+        color *= 1.0 - coastShadow * min(relief * 35.0, 0.65);
         color += vec3(lighting.z) * (1.0 - land * 0.88);
         gl_FragColor = vec4(color, 1.0);
         #include <colorspace_fragment>

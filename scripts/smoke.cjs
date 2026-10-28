@@ -32,7 +32,7 @@ const { launch, baseURL } = require('./browser.cjs');
         renderer: debug ? gl.getParameter(debug.UNMASKED_RENDERER_WEBGL) : 'unknown' };
     });
     assert(Math.abs(performance.rotationPeriod - 60) < 0.01, '60-second rotation period');
-    assert.equal(performance.drawCalls, 1);
+    assert.equal(performance.drawCalls, 2);
     fs.writeFileSync('/tmp/expla-globe-performance.json', JSON.stringify(performance, null, 2));
     await page.screenshot({ path: '/tmp/expla-globe-desktop.png' });
     await page.setViewportSize({ width: 390, height: 844 });

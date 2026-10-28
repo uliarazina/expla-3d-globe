@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { geoEquirectangular, geoPath, geoArea } from 'd3-geo';
 import './Globe.css';
 import { createGlobeMaterial } from './globeMaterial.js';
+import { createGlobeMarkers } from './globeMarkers.js';
 
 /** Standalone, transparent globe. The parent controls its size. */
 export default function Globe({
@@ -10,6 +11,7 @@ export default function Globe({
   rotationPeriod = 60,
   paused = false,
   interactive = true,
+  showMarkers = true,
   landColor = '#03FA7F',
   oceanColor = '#212121',
   borderColor = '#02e573',
@@ -60,15 +62,16 @@ export default function Globe({
       // Keep the angle unwrapped, avoiding a discontinuity at the loop boundary.
       if (spinning) globe.rotation.y += (Math.PI * 2 / rotationPeriod) * delta;
       elapsed += delta;
+      if (markers) markers.material.uniforms.time.value = elapsed;
       renderer.render(scene, camera);
       onFrame?.({ timestamp, delta, elapsed, rotation: globe.rotation.y, axisTilt: globe.rotation.x,
         drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles,
-        textureWidth: globe.material.uniforms.colorMap.value.image.width, pixelRatio: renderer.getPixelRatio() });
+        textureWidth: globe.material.uniforms.colorMap.value.image.width, pixelRatio: renderer.getPixelRatio(), markerCount: markers?.geometry.attributes.position.count || 0 });
       if (spinning) schedule();
       else previousTime = null;
     }
 
-    let scene, camera, globe;
+    let scene, camera, globe, markers;
     async function initialize() {
       try {
         setError('');
@@ -119,14 +122,14 @@ export default function Globe({
         const height = mask.height;
         const coverage = (x, y) => raw[(Math.max(0, Math.min(height - 1, y)) * width + (x + width) % width) * 4];
         // Keep bevel width constant in geographic space as atlas quality increases.
-        const bevelStep = Math.max(1, Math.round(width / 1536));
+        const bevelStep = Math.max(1, Math.round(width / 2048));
         // Yield between rows so the higher-resolution atlas does not freeze the hero.
         for (let y = 0; y < height; y++) {
           for (let x = 0; x < width; x++) {
             const offset = (y * width + x) * 4;
             pixels.data[offset + 1] = Math.round(127.5 + (coverage(x + bevelStep, y) - coverage(x - bevelStep, y)) / 2);
             pixels.data[offset + 2] = Math.round(127.5 + (coverage(x, y - bevelStep) - coverage(x, y + bevelStep)) / 2);
-            pixels.data[offset + 3] = coverage(x - 3 * bevelStep, y - 3 * bevelStep);
+            pixels.data[offset + 3] = coverage(x - 2 * bevelStep, y - 2 * bevelStep);
           }
           if ((y + 1) % 64 === 0) {
             await new Promise(resolve => setTimeout(resolve, 0));
@@ -166,6 +169,11 @@ export default function Globe({
         globe = new THREE.Mesh(geometry, material);
         globe.rotation.set(0.5, -1.45, 0);
         scene.add(globe);
+        if (showMarkers) {
+          markers = createGlobeMarkers();
+          globe.add(markers);
+          resources.push(markers.geometry, markers.material);
+        }
         const canvas = renderer.domElement;
         canvas.setAttribute('role', 'img');
         canvas.setAttribute('aria-label', interactive
@@ -207,6 +215,8 @@ export default function Globe({
         const resize = () => {
           const { width, height } = host.getBoundingClientRect();
           if (!width || !height) return;
+          renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, Math.max(1, maxPixelRatio)));
+          if (markers) markers.material.uniforms.pixelRatio.value = renderer.getPixelRatio();
           renderer.setSize(width, height);
           camera.aspect = width / height; camera.updateProjectionMatrix();
           // Fit a complete sphere even in portrait-shaped embedding containers.
@@ -238,7 +248,7 @@ export default function Globe({
       removeInteraction(); resources.forEach(resource => resource.dispose());
       renderer?.dispose(); renderer?.domElement.remove();
     };
-  }, [dataUrl, interactive, landColor, oceanColor, borderColor, relief, rimStrength, maxPixelRatio, textureWidth]);
+  }, [dataUrl, interactive, showMarkers, landColor, oceanColor, borderColor, relief, rimStrength, maxPixelRatio, textureWidth]);
 
   return <div className={`expla-globe ${className}`} style={style} ref={mount} data-interactive={interactive}>
     {error && <p className="expla-globe__error" role="alert">{error}</p>}
