@@ -27,8 +27,8 @@ export function createGlobeMarkers() {
     transparent: true, depthTest: false, depthWrite: false,
     uniforms: {
       time: { value: 0 }, pixelRatio: { value: 1 }, duration: { value: 1.5 },
-      diameter: { value: 28 }, dotDiameter: { value: 4 }, lineWidth: { value: 1.2 },
-      reducedMotion: { value: 0 }, color: { value: new THREE.Color('#F8F000') },
+      diameter: { value: 32 }, dotDiameter: { value: 5 }, lineWidth: { value: 1.4 },
+      reducedMotion: { value: 0 }, color: { value: new THREE.Color('#FFFFFF') },
       canvasSize: { value: new THREE.Vector2(1, 1) }, sphereRadius: { value: 1 },
     },
     vertexShader: `
@@ -92,9 +92,9 @@ export function updateGlobeMarkers(points, { time, camera, mobile = false, reduc
   const uniforms = points.material.uniforms;
   uniforms.time.value = time;
   uniforms.duration.value = mobile ? 1.35 : 1.5;
-  uniforms.diameter.value = mobile ? 22 : 28;
-  uniforms.dotDiameter.value = mobile ? 3 : 4;
-  uniforms.lineWidth.value = mobile ? 1 : 1.2;
+  uniforms.diameter.value = mobile ? 26 : 32;
+  uniforms.dotDiameter.value = mobile ? 4 : 5;
+  uniforms.lineWidth.value = mobile ? 1.2 : 1.4;
   uniforms.reducedMotion.value = reducedMotion ? 1 : 0;
   if (reducedMotion) return;
   const state = points.userData.pulses;

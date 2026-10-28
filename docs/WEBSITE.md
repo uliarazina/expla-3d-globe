@@ -99,3 +99,5 @@ The platform carousel now loops right-to-left at 42 CSS px/s without interceptin
 The footer includes the requested powered-by and business names. Original Cpamatica, Traffic Kitchen and adoly logo files were not supplied, so these are explicitly text placeholders pending SVG/PNG assets, rather than reconstructed brand artwork.
 
 Additional mobile/radar refinement: carousel arrow controls are hidden at widths up to 760px, with the same item sizes, spacing, touch handling and uninterrupted leftward autoplay. Desktop controls and hover behaviour are unchanged. White fading globe dots are replaced by staggered yellow `#F8F000` radar rings; see the integration guide for sizes, timings, silhouette clipping and reduced-motion behaviour. No globe surface, lighting or rotation settings were modified.
+
+Latest marker appearance: radar centres and rings are white (`#FFFFFF`). Desktop ring/centre sizes are 32/5 CSS pixels; mobile sizes are 26/4 pixels. Thin outlines are 1.4px and 1.2px respectively. Timing, geographic positions, concurrency limits, silhouette clipping and all globe surface/rotation settings remain unchanged.

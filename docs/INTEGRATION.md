@@ -62,7 +62,7 @@ No global Three.js scripts, external APIs, or credentials are needed. Mount once
 | `dataUrl` | `/data/countries.geojson` | GeoJSON asset URL. Use the supplied, filtered file. |
 | `rotationPeriod` | `60` | Seconds per revolution. Positive finite values animate; zero or negative values stop automatic rotation. |
 | `paused` | `false` | Stop automatic rotation without blocking manual interaction. Can be controlled by the host page. |
-| `showMarkers` | `true` | Show yellow radar pulses at 22 geographic locations; disable to use the original unmarked sphere. |
+| `showMarkers` | `true` | Show white radar pulses at 22 geographic locations; disable to use the original unmarked sphere. |
 | `interactive` | `true` | Enable horizontal mouse/touch turns and left/right arrow keys. Vertical gestures scroll the page without tilting the globe; the camera never orbits. |
 | `landColor` | `#03FA7F` | Polygon fill. |
 | `oceanColor` | `#212121` | Solid sphere color underneath polygons, including excluded areas. |
@@ -103,7 +103,7 @@ The final sharpness pass retains 4096×2048 atlases and the 2× pixel-density ca
 
 Location pulses are defined in `src/components/globeMarkers.js` at the same 22 real country coordinates. They are children of the sphere mesh and use circular screen-space sprites. Front-facing tests hide the far hemisphere; exact projected-sphere clipping prevents any ring escaping the silhouette. The overlay uses explicit clipping instead of depth testing so a flat circular ring is not partly buried in the curved surface.
 
-Yellow `#F8F000` pulses have a 4 CSS-pixel centre, a thin 1.2-pixel outline expanding to 28 pixels over 1.5 seconds, and a small centre-only glow. A scheduler chooses visible countries in sequence: at most three active pulses on desktop, two on mobile. Mobile reduces the ring to 22 pixels, centre to 3 pixels, outline to 1 pixel and duration to 1.35 seconds. Each country has a cooldown. Reduced motion displays static yellow dots without repeating rings. The sphere material, geometry, camera, tilt, country coordinates and 60-second rotation are unchanged.
+White `#FFFFFF` pulses have a 5 CSS-pixel centre, a thin 1.4-pixel outline expanding to 32 pixels over 1.5 seconds, and a small centre-only glow. A scheduler chooses visible countries in sequence: at most three active pulses on desktop, two on mobile. Mobile reduces the ring to 26 pixels, centre to 4 pixels, outline to 1.2 pixels and duration to 1.35 seconds. Each country has a cooldown. Reduced motion displays static white dots without repeating rings. The sphere material, geometry, camera, tilt, country coordinates and 60-second rotation are unchanged.
 
 `npm run test:markers` checks geographic containment, real WebGL ring expansion/circularity, full fade, far-side hiding, silhouette clipping, static reduced-motion markers, concurrency budgets and coverage of all 22 countries over rotations. `showMarkers={false}` removes only this overlay.
 

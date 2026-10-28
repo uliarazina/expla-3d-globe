@@ -16,15 +16,15 @@ export function checkMarkerRendering() {
   const sample = time => {
     dots.material.uniforms.time.value = time; renderer.render(scene, camera);
     gl.readPixels(0, 0, 128, 128, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
-    let yellow = 0, outside = 0, minX = 128, minY = 128, maxX = 0, maxY = 0;
+    let white = 0, outside = 0, minX = 128, minY = 128, maxX = 0, maxY = 0;
     for (let y = 0; y < 128; y++) for (let x = 0; x < 128; x++) {
       const i = (y * 128 + x) * 4;
-      if (pixels[i] > 60 && pixels[i+1] > 60 && pixels[i+2] < 60) {
-        yellow++; minX = Math.min(minX,x); maxX = Math.max(maxX,x); minY = Math.min(minY,y); maxY = Math.max(maxY,y);
+      if (pixels[i] > 60 && pixels[i+1] > 60 && pixels[i+2] > 60) {
+        white++; minX = Math.min(minX,x); maxX = Math.max(maxX,x); minY = Math.min(minY,y); maxY = Math.max(maxY,y);
         if (Math.hypot(x+.5-64, y+.5-64) > dots.material.uniforms.sphereRadius.value + .5) outside++;
       }
     }
-    return { yellow, outside, width: yellow ? maxX-minX+1 : 0, height: yellow ? maxY-minY+1 : 0 };
+    return { white, outside, width: white ? maxX-minX+1 : 0, height: white ? maxY-minY+1 : 0 };
   };
   try {
     face([0,0,1]); const early = sample(.2), expanded = sample(.8), faded = sample(2);
