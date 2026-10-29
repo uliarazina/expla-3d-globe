@@ -1,5 +1,5 @@
 const assert = require('node:assert/strict');
-const { mkdirSync } = require('node:fs');
+const { mkdirSync, readFileSync } = require('node:fs');
 const { launch, baseURL } = require('./browser.cjs');
 
 (async () => {
@@ -43,7 +43,15 @@ const { launch, baseURL } = require('./browser.cjs');
       await page.getByRole('dialog').waitFor();
       await page.keyboard.press('Escape');
     }
-    await page.getByRole('button', { name: 'Facebook', exact: true }).click();
+    assert.equal(await page.locator('.site-footer').getByRole('button', { name: 'Facebook', exact: true }).count(), 0);
+    for (const name of ['Cpamatica', 'Traffic Kitchen', 'Adply']) {
+      const image = page.locator('.site-footer').getByRole('img', { name, exact: true });
+      assert(await image.evaluate(async img => { await img.decode(); return img.naturalWidth > 0; }), 'original footer SVG decodes');
+      const url = await image.evaluate(img => img.src);
+      const response = await page.request.get(url);
+      assert((await response.body()).equals(readFileSync('public/brand/' + new URL(url).pathname.split('/').at(-1))), 'uploaded footer logo bytes are served unchanged');
+    }
+    await page.getByRole('button', { name: 'Telegram', exact: true }).click();
     await page.getByRole('dialog').waitFor();
     await page.keyboard.press('Escape');
     mkdirSync('previews', { recursive: true });

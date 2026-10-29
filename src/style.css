@@ -188,3 +188,15 @@
   .direction-dialog-tagbar{padding-block:10px}
 }
 @media(max-width:600px) and (max-height:500px){.direction-dialog{scroll-padding-top:calc(var(--direction-controls-height,152px) + 45px)}}
+/* Original uploaded footer brand artwork. */
+.footer-brands{flex-wrap:nowrap}
+.footer-brand-logos{display:flex;align-items:center;gap:30px}
+.footer-brand-logos img{display:block;width:auto;height:auto;max-height:32px;flex-shrink:0}
+@media(max-width:760px){
+  .site-footer{flex-direction:column;align-items:stretch;gap:20px}
+  .footer-brands{flex-direction:column;align-items:flex-start;gap:18px;width:100%}
+  .footer-brand-logos{width:100%;justify-content:space-between;gap:18px}
+  .footer-brand-logos img{max-width:28%;max-height:32px;flex-shrink:1}
+  .site-footer .social-links{width:100%;justify-content:space-between;gap:12px;border-top:1px solid rgb(190 190 190 / 30%);padding-top:14px}
+}
+.site-footer{flex-wrap:wrap}

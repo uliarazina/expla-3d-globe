@@ -96,7 +96,7 @@ Final refinements (2026-10-28): the TOP-100 section now has a straight horizonta
 
 The platform carousel now loops right-to-left at 42 CSS px/s without intercepting wheel scrolling. Its two identical groups join seamlessly; previous/next buttons and touch dragging operate on the same wrapped offset. Arrow impulses ease into position while automatic motion continues. Buttons turn dark with white arrows on hover. Reduced motion stops autoplay but keeps manual navigation.
 
-The footer includes the requested powered-by and business names. Original Cpamatica, Traffic Kitchen and adoly logo files were not supplied, so these are explicitly text placeholders pending SVG/PNG assets, rather than reconstructed brand artwork.
+The footer uses the original uploaded Cpamatica, Traffic Kitchen and Adply SVG files, served unchanged from `public/brand`. The supplied artwork is already white and needs no recolouring. Telegram replaces Facebook; social buttons retain their prototype dialog behaviour until real destination URLs are supplied. On mobile the powered-by line sits above the logos, with a divider before the social row.
 
 Additional mobile/radar refinement: carousel arrow controls are hidden at widths up to 760px, with the same item sizes, spacing, touch handling and uninterrupted leftward autoplay. Desktop controls and hover behaviour are unchanged. White fading globe dots are replaced by staggered yellow `#F8F000` radar rings; see the integration guide for sizes, timings, silhouette clipping and reduced-motion behaviour. No globe surface, lighting or rotation settings were modified.
 
