@@ -7,12 +7,22 @@ export default function DirectionDialogContent({ language, cards, index, onChang
   const [menuOpen, setMenuOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const selector = useRef(null);
+  const controls = useRef(null);
+  useEffect(() => {
+    const element = controls.current, dialog = element.closest('dialog');
+    const measure = () => {
+      const height = element.getBoundingClientRect().height;
+      if (height > 0) dialog.style.setProperty('--direction-controls-height', `${height}px`);
+    };
+    const observer = new ResizeObserver(measure); observer.observe(element); measure();
+    return () => { observer.disconnect(); dialog.style.removeProperty('--direction-controls-height'); };
+  }, []);
   const menuId = useId(), benefitsId = useId();
   useEffect(() => { setMenuOpen(false); setExpanded(false); }, [index]);
   const card = cards[index];
   const detail = directionDetails[language][index];
   return <>
-    <div className="direction-dialog-controls">
+    <div className="direction-dialog-controls" ref={controls}>
       <div className="direction-dialog-toolbar"><Logo linked={false}/><button className="dialog-close direction-dialog-close" type="button" aria-label={closeLabel} onClick={onClose} autoFocus><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><path d="m5 5 14 14M19 5 5 19"/></svg></button></div>
       <nav className="direction-tabs" aria-label={language === 'uk' ? 'Напрямки бізнесу' : 'Business areas'}>{cards.map((item, itemIndex) => <button type="button" key={item.title} aria-current={itemIndex === index ? 'page' : undefined} onClick={() => onChange(itemIndex)}>{item.title}{itemIndex !== index && <span aria-hidden="true">›</span>}</button>)}</nav>
       <div className="direction-select-wrap">
@@ -21,8 +31,9 @@ export default function DirectionDialogContent({ language, cards, index, onChang
       </div>
     </div>
     <header className="direction-dialog-header">
-      <h2 id="dialog-title">{card.title}</h2><p className="direction-dialog-tags">{detail.tags}</p>
+      <h2 id="dialog-title">{card.title}</h2>
     </header>
+    <div className="direction-dialog-tagbar"><p className="direction-dialog-tags">{detail.tags}</p></div>
     <div className="direction-dialog-body">
       <p className="direction-dialog-lead">{detail.lead}</p>
       <div className="direction-dialog-description">{detail.paragraphs.map(text => <p key={text}>{text}</p>)}</div>

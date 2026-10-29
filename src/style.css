@@ -163,3 +163,28 @@
 }
 /* Subtle outline around each popup, including full-screen mobile dialogs. */
 .info-dialog,.info-dialog.direction-dialog{border:1px solid rgb(190 190 190 / 30%)}
+/* Tags pin directly below the measured mobile controls; the title still scrolls. */
+.direction-dialog-header{padding-bottom:0}
+.direction-dialog-tagbar{display:flow-root;padding:22px 50px 48px;background:var(--black)}
+.direction-dialog .direction-dialog-tagbar .direction-dialog-tags{margin:0}
+@media(max-width:900px){.direction-dialog-tagbar{padding-inline:30px}}
+@media(max-width:600px){
+  .direction-dialog-tagbar{position:sticky;top:var(--direction-controls-height,204px);z-index:4;padding:22px 15px 50px}
+  .direction-dialog{scroll-padding-top:calc(var(--direction-controls-height,204px) + 110px)}
+}
+@media(max-width:600px) and (max-height:500px){
+  .direction-dialog-tagbar{padding:10px 15px}
+  .direction-dialog .direction-options{max-height:max(44px,calc(100svh - 240px - env(safe-area-inset-top)))}
+  .direction-dialog{scroll-padding-top:calc(var(--direction-controls-height,152px) + 45px)}
+}
+/* The same pinned navigation is available in desktop popups too. */
+.direction-dialog-controls{position:sticky;top:0;z-index:5;background:var(--black)}
+.direction-dialog-tagbar{position:sticky;top:var(--direction-controls-height,230px);z-index:4}
+.direction-dialog{scroll-padding-top:calc(var(--direction-controls-height,230px) + 110px)}
+@media(min-width:601px) and (max-height:500px){
+  .direction-dialog-controls{padding-top:14px}
+  .direction-dialog-controls .direction-dialog-toolbar{margin-bottom:16px}
+  .direction-dialog-controls .direction-tabs{margin-bottom:18px}
+  .direction-dialog-tagbar{padding-block:10px}
+}
+@media(max-width:600px) and (max-height:500px){.direction-dialog{scroll-padding-top:calc(var(--direction-controls-height,152px) + 45px)}}

@@ -46,6 +46,12 @@ const { launch, baseURL } = require('./browser.cjs');
       const box = await control.boundingBox();
       assert(box.y >= 0 && box.y + box.height <= 844, 'logo, close and direction selector remain visible at the bottom');
     }
+    const tags = dialog.locator('.direction-dialog-tags');
+    const pinnedTags = await tags.boundingBox();
+    assert(pinnedTags.y >= (await controls.boundingBox()).y + (await controls.boundingBox()).height, 'tags pin below the controls without overlap');
+    assert(pinnedTags.y + pinnedTags.height < 844, 'tags stay visible near the top of the mobile viewport');
+    await dialog.evaluate(e => { e.scrollTop -= 100; });
+    assert(Math.abs((await tags.boundingBox()).y - pinnedTags.y) < 1, 'tags remain pinned while the body scrolls');
     await selector.click();
     assert.equal(await dialog.locator('.direction-options button:visible').count(), 3, 'direction menu is usable from the bottom');
     await dialog.locator('.direction-options').getByRole('button', { name: 'PPC Team', exact: true }).click();
@@ -60,6 +66,8 @@ const { launch, baseURL } = require('./browser.cjs');
     await selector.click();
     const options = await dialog.locator('.direction-options').boundingBox();
     assert(options.y >= 0 && options.y + options.height <= 320, 'landscape direction menu fits and scrolls in the viewport');
+    const landscapeTags = await tags.boundingBox();
+    assert(landscapeTags.y >= options.y + options.height && landscapeTags.y + landscapeTags.height <= 320, 'tags follow the expanded menu without overlap on short screens');
     await selector.click();
     await page.setViewportSize({ width: 360, height: 844 });
     await dialog.evaluate(e => e.scrollTo(0, 0));
@@ -92,6 +100,14 @@ const { launch, baseURL } = require('./browser.cjs');
       await page.mouse.move(0, 0); await page.evaluate(() => document.activeElement?.blur());
       await dialog.screenshot({ path: `previews/expla-popup-${slugs[index]}-desktop.png` });
     }
+    await page.setViewportSize({ width: 1440, height: 844 });
+    await dialog.evaluate(e => e.scrollTo(0, e.scrollHeight));
+    assert(Math.abs((await controls.boundingBox()).y - (await dialog.boundingBox()).y) <= 1.1, 'desktop controls stay pinned inside the popup');
+    const desktopTags = await tags.boundingBox(), desktopControls = await controls.boundingBox();
+    assert(desktopTags.y >= desktopControls.y + desktopControls.height && desktopTags.y + desktopTags.height < (await dialog.boundingBox()).y + (await dialog.boundingBox()).height, 'desktop tags stay visible below the pinned controls');
+    await dialog.locator('.direction-tabs').getByRole('button', { name: 'PPC Team', exact: true }).click();
+    assert.equal(await dialog.evaluate(e => e.scrollTop), 0);
+    await dialog.locator('.direction-tabs').getByRole('button', { name: 'Affiliate Network', exact: true }).click();
     await page.setViewportSize({ width: 360, height: 3000 });
     const captureMobile = async path => {
       await dialog.evaluate(e => e.scrollTo(0, 0));
